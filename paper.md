@@ -73,17 +73,7 @@ Tabel 1 menyajikan posisi penelitian ini dalam literatur machine learning perpaj
 ### 3.1 Data Generating Process (DGP) dan Asumsi Parameter Simulasi
 Parameter numerik dalam proses pembangkitan data merupakan asumsi simulasi terstruktur (*simulation assumptions*) yang diinformasikan oleh karakteristik makro perniagaan digital Indonesia, bukan estimasi empiris langsung dari data wajib pajak individual rahasia. 
 
-Untuk merepresentasikan heterogenitas makro wilayah, kami memilih 10 provinsi yang merepresentasikan konsentrasi pelaku usaha perniagaan elektronik di Indonesia (BPS, 2024). Nilai indikator makro setiap provinsi di-*anchor* secara spesifik pada data agregat publik BPS: persentase usaha melakukan kegiatan e-commerce dari *Statistik E-Commerce 2024* (Tabel 3.1) dan indeks kesiapan infrastruktur dari *Indeks Pembangunan Teknologi Informasi dan Komunikasi (IP-TIK) 2023* (Tabel 4, skala 0–10). Nilai acuan per provinsi adalah sebagai berikut:
-1. DKI Jakarta: Penetrasi E-Commerce $63,54\%$, IP-TIK $7,73$
-2. Jawa Barat: Penetrasi E-Commerce $43,38\%$, IP-TIK $6,15$
-3. Banten: Penetrasi E-Commerce $44,12\%$, IP-TIK $6,38$
-4. Jawa Timur: Penetrasi E-Commerce $36,85\%$, IP-TIK $5,96$
-5. Jawa Tengah: Penetrasi E-Commerce $33,20\%$, IP-TIK $5,86$
-6. Bali: Penetrasi E-Commerce $48,74\%$, IP-TIK $6,60$
-7. Sumatera Utara: Penetrasi E-Commerce $28,41\%$, IP-TIK $6,04$
-8. Sulawesi Selatan: Penetrasi E-Commerce $27,90\%$, IP-TIK $6,01$
-9. Riau: Penetrasi E-Commerce $26,15\%$, IP-TIK $6,07$
-10. Sumatera Selatan: Penetrasi E-Commerce $24,32\%$, IP-TIK $5,88$
+Untuk merepresentasikan heterogenitas makro wilayah, kami memilih 10 provinsi yang merepresentasikan konsentrasi pelaku usaha perniagaan elektronik di Indonesia (BPS, 2024). Nilai indikator makro setiap provinsi di-*anchor* secara spesifik pada data agregat publik BPS: indikator *Persentase Usaha Melakukan Kegiatan E-Commerce* dari *Statistik E-Commerce 2024* (Tabel 3.1) dan indeks kesiapan infrastruktur dari *Indeks Pembangunan Teknologi Informasi dan Komunikasi (IP-TIK) 2023* (Tabel 4, skala 0–10). Detail nilai jangkar provinsi dan sumber tabel disajikan pada Lampiran A.
 
 Untuk setiap observasi pedagang pada provinsi $p$, fitur makro teramati diberikan perturbasi Gaussian lokal terkalibrasi sesuai skala metrik: $EComPct_p = \text{Benchmark}_p + \varepsilon_{\text{ecom}}$ di mana $\varepsilon_{\text{ecom}} \sim \mathcal{N}(0, 1,5^2)$ (persentase), dan $Infra_p = \text{IP-TIK}_p + \varepsilon_{\text{infra}}$ di mana $\varepsilon_{\text{infra}} \sim \mathcal{N}(0, 0,12^2)$ (skala indeks 0–10, mempertahankan koefisien variasi sekitar $1,8\%$ agar sinyal spasial provinsi tidak terhapus oleh noise).
 
@@ -271,3 +261,28 @@ c. **Validasi Berkala Lintas Wilayah:** Melakukan evaluasi berkala terhadap indi
 * Perez-Truglia, R. (2020). The effects of income transparency: Evidence from digital disclosure in Norway. *Journal of Political Economy*, 128(7), 2677-2716. https://doi.org/10.1086/706798
 * Republik Indonesia. (2022). *Undang-Undang Republik Indonesia Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi*. Lembaran Negara Republik Indonesia Tahun 2022 Nomor 196. Jakarta.
 * Slemrod, J. (2019). Tax compliance and enforcement. *Journal of Economic Literature*, 57(4), 904-954. https://doi.org/10.1257/jel.20181437
+
+---
+
+## LAMPIRAN A. NILAI JANGKAR INDIKATOR MAKRO PROVINSI BPS (DATA PROVENANCE)
+
+Tabel A1 merangkum nilai jangkar makro agregat 10 provinsi yang digunakan dalam proses pembangkitan data sintetis (*Data Generating Process*).
+
+**Tabel A1. Nilai Jangkar Indikator Regional BPS pada 10 Provinsi Utama**
+
+| No | Provinsi | Persentase Usaha Melakukan Kegiatan E-Commerce (%)¹ | Indeks Pembangunan TIK (IP-TIK 2023, Skala 0–10)² |
+| :-: | :--- | :---: | :---: |
+| 1 | DKI Jakarta | 63,54 | 7,73 |
+| 2 | Bali | 48,74 | 6,60 |
+| 3 | Banten | 44,12 | 6,38 |
+| 4 | Jawa Barat | 43,38 | 6,15 |
+| 5 | Jawa Timur | 36,85 | 5,96 |
+| 6 | Jawa Tengah | 33,20 | 5,86 |
+| 7 | Sumatera Utara | 28,41 | 6,04 |
+| 8 | Sulawesi Selatan | 27,90 | 6,01 |
+| 9 | Riau | 26,15 | 6,07 |
+| 10 | Sumatera Selatan | 24,32 | 5,88 |
+
+*Sumber data:*  
+¹ Badan Pusat Statistik. (2024). *Statistik E-Commerce 2024*, Tabel 3.1 (Persentase Usaha yang Melakukan Kegiatan E-Commerce Menurut Provinsi).  
+² Badan Pusat Statistik. (2024). *Indeks Pembangunan Teknologi Informasi dan Komunikasi 2023*, Tabel 4 (Indeks Pembangunan TIK Menurut Provinsi).  
