@@ -2,17 +2,14 @@ import os
 import json
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import optuna
 from optuna.samplers import TPESampler
-import shap
 
 from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import (
     roc_auc_score, precision_recall_curve, auc, 
-    f1_score, precision_score, recall_score, roc_curve, confusion_matrix, classification_report
+    f1_score, precision_score, recall_score, confusion_matrix
 )
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -20,20 +17,22 @@ import lightgbm as lgb
 import xgboost as xgb
 
 optuna.logging.set_verbosity(optuna.logging.WARNING)
-
 SEED = 42
 
-class TaxComplianceAutoMLPipeline:
-    def __init__(self, data_path: str, output_dir: str):
-        self.data_path = data_path
-        self.output_dir = output_dir
-        self.images_dir = os.path.join(output_dir, "images")
-        os.makedirs(self.images_dir, exist_ok=True)
+class RobustTaxCompliancePipeline:
+    def __init__(self, data_path: str):
+        self.df = pd.read_csv(data_path)
+        self.feature_cols = [
+            "gmv_transaksi_juta", "annual_order_volume", "avg_ticket_size_ribu",
+            "digital_payment_ratio", "logistics_tracking_ratio", "customer_return_rate",
+            "bps_ecom_penetration_pct", "bps_infra_index",
+            "reported_turnover_spt_juta", "tax_paid_final_juta"
+        ]
+        self.target_col = "target_non_compliance"
         
-        self.df = pd.read_csv(self.data_path)
-        self.X = self.df.drop(columns=["provinsi", "target_compliance_risk"])
-        self.y = self.df["target_compliance_risk"]
-        
+        # 1. Standard Split (Stratified 80/20)
+        self.X = self.df[self.feature_cols]
+        self.y = self.df[self.target_col]
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
             self.X, self.y, test_size=0.20, random_state=SEED, stratify=self.y
         )
@@ -41,186 +40,165 @@ class TaxComplianceAutoMLPipeline:
         self.scaler = StandardScaler()
         self.X_train_scaled = self.scaler.fit_transform(self.X_train)
         self.X_test_scaled = self.scaler.transform(self.X_test)
-        
-        self.models = {}
-        self.predictions = {}
-        self.probabilities = {}
 
-    def run_baselines(self):
-        lr = LogisticRegression(random_state=SEED, max_iter=1000)
-        lr.fit(self.X_train_scaled, self.y_train)
-        self.models["Logistic Regression"] = lr
-        self.probabilities["Logistic Regression"] = lr.predict_proba(self.X_test_scaled)[:, 1]
-        self.predictions["Logistic Regression"] = lr.predict(self.X_test_scaled)
+    def run_all_evaluations(self) -> dict:
+        results = {}
         
-        rf = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=SEED)
-        rf.fit(self.X_train, self.y_train)
-        self.models["Random Forest"] = rf
-        self.probabilities["Random Forest"] = rf.predict_proba(self.X_test)[:, 1]
-        self.predictions["Random Forest"] = rf.predict(self.X_test)
-
-    def optimize_automl(self, n_trials: int = 30):
+        # A. Baseline Models
+        lr = LogisticRegression(random_state=SEED, max_iter=1000).fit(self.X_train_scaled, self.y_train)
+        rf = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=SEED).fit(self.X_train, self.y_train)
+        lgbm = lgb.LGBMClassifier(random_state=SEED, verbose=-1).fit(self.X_train, self.y_train)
+        
+        # B. Bayesian AutoML Optimization (TPE on XGBoost)
         cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)
-        
         def objective(trial):
-            classifier_name = trial.suggest_categorical("classifier", ["LightGBM", "XGBoost"])
-            
-            if classifier_name == "LightGBM":
-                params = {
-                    "n_estimators": trial.suggest_int("lgb_n_estimators", 50, 250),
-                    "learning_rate": trial.suggest_float("lgb_lr", 0.01, 0.2, log=True),
-                    "num_leaves": trial.suggest_int("lgb_num_leaves", 15, 127),
-                    "max_depth": trial.suggest_int("lgb_max_depth", 3, 10),
-                    "subsample": trial.suggest_float("lgb_subsample", 0.6, 1.0),
-                    "colsample_bytree": trial.suggest_float("lgb_colsample", 0.6, 1.0),
-                    "random_state": SEED,
-                    "verbose": -1
-                }
-                model = lgb.LGBMClassifier(**params)
-            else:
-                params = {
-                    "n_estimators": trial.suggest_int("xgb_n_estimators", 50, 250),
-                    "learning_rate": trial.suggest_float("xgb_lr", 0.01, 0.2, log=True),
-                    "max_depth": trial.suggest_int("xgb_max_depth", 3, 10),
-                    "subsample": trial.suggest_float("xgb_subsample", 0.6, 1.0),
-                    "colsample_bytree": trial.suggest_float("xgb_colsample", 0.6, 1.0),
-                    "random_state": SEED,
-                    "eval_metric": "logloss"
-                }
-                model = xgb.XGBClassifier(**params)
-                
+            params = {
+                "n_estimators": trial.suggest_int("n_estimators", 50, 250),
+                "learning_rate": trial.suggest_float("lr", 0.01, 0.20, log=True),
+                "max_depth": trial.suggest_int("max_depth", 3, 8),
+                "subsample": trial.suggest_float("subsample", 0.6, 1.0),
+                "colsample_bytree": trial.suggest_float("colsample", 0.6, 1.0),
+                "random_state": SEED,
+                "eval_metric": "logloss"
+            }
+            model = xgb.XGBClassifier(**params)
             scores = []
-            for train_idx, val_idx in cv.split(self.X_train, self.y_train):
-                X_tr, X_val = self.X_train.iloc[train_idx], self.X_train.iloc[val_idx]
-                y_tr, y_val = self.y_train.iloc[train_idx], self.y_train.iloc[val_idx]
+            for tr_idx, val_idx in cv.split(self.X_train, self.y_train):
+                X_tr, X_val = self.X_train.iloc[tr_idx], self.X_train.iloc[val_idx]
+                y_tr, y_val = self.y_train.iloc[tr_idx], self.y_train.iloc[val_idx]
                 model.fit(X_tr, y_tr)
-                preds = model.predict_proba(X_val)[:, 1]
-                scores.append(roc_auc_score(y_val, preds))
+                scores.append(roc_auc_score(y_val, model.predict_proba(X_val)[:, 1]))
             return np.mean(scores)
             
         study = optuna.create_study(direction="maximize", sampler=TPESampler(seed=SEED))
-        study.optimize(objective, n_trials=n_trials)
+        study.optimize(objective, n_trials=30)
         
-        best_params = study.best_params
-        best_type = best_params["classifier"]
+        bp = study.best_params
+        best_xgb = xgb.XGBClassifier(
+            n_estimators=bp["n_estimators"], learning_rate=bp["lr"],
+            max_depth=bp["max_depth"], subsample=bp["subsample"],
+            colsample_bytree=bp["colsample"], random_state=SEED, eval_metric="logloss"
+        ).fit(self.X_train, self.y_train)
         
-        if best_type == "LightGBM":
-            best_model = lgb.LGBMClassifier(
-                n_estimators=best_params["lgb_n_estimators"],
-                learning_rate=best_params["lgb_lr"],
-                num_leaves=best_params["lgb_num_leaves"],
-                max_depth=best_params["lgb_max_depth"],
-                subsample=best_params["lgb_subsample"],
-                colsample_bytree=best_params["lgb_colsample"],
-                random_state=SEED,
-                verbose=-1
-            )
-        else:
-            best_model = xgb.XGBClassifier(
-                n_estimators=best_params["xgb_n_estimators"],
-                learning_rate=best_params["xgb_lr"],
-                max_depth=best_params["xgb_max_depth"],
-                subsample=best_params["xgb_subsample"],
-                colsample_bytree=best_params["xgb_colsample"],
-                random_state=SEED,
-                eval_metric="logloss"
-            )
+        models_dict = {
+            "Logistic Regression": (lr, self.X_test_scaled),
+            "Random Forest": (rf, self.X_test),
+            "LightGBM": (lgbm, self.X_test),
+            "AutoML (XGBoost TPE)": (best_xgb, self.X_test)
+        }
+        
+        # Compute 5-Fold CV metrics on Train Set
+        cv_scores = {}
+        for m_name, (m_obj, _) in models_dict.items():
+            m_cv_auc = []
+            for tr_idx, val_idx in cv.split(self.X_train, self.y_train):
+                if m_name == "Logistic Regression":
+                    X_tr = self.scaler.fit_transform(self.X_train.iloc[tr_idx])
+                    X_v = self.scaler.transform(self.X_train.iloc[val_idx])
+                else:
+                    X_tr = self.X_train.iloc[tr_idx]
+                    X_v = self.X_train.iloc[val_idx]
+                y_tr, y_v = self.y_train.iloc[tr_idx], self.y_train.iloc[val_idx]
+                m_obj.fit(X_tr, y_tr)
+                m_cv_auc.append(roc_auc_score(y_v, m_obj.predict_proba(X_v)[:, 1]))
+            cv_scores[m_name] = (np.mean(m_cv_auc), np.std(m_cv_auc))
             
-        best_model.fit(self.X_train, self.y_train)
-        self.models[f"AutoML ({best_type})"] = best_model
-        self.probabilities[f"AutoML ({best_type})"] = best_model.predict_proba(self.X_test)[:, 1]
-        self.predictions[f"AutoML ({best_type})"] = best_model.predict(self.X_test)
-        self.best_model_name = f"AutoML ({best_type})"
-        self.best_model = best_model
-
-    def evaluate_and_plot(self) -> dict:
-        results = {}
+        # Re-fit on full train set
+        lr.fit(self.X_train_scaled, self.y_train)
+        rf.fit(self.X_train, self.y_train)
+        lgbm.fit(self.X_train, self.y_train)
+        best_xgb.fit(self.X_train, self.y_train)
         
-        for name, probs in self.probabilities.items():
-            preds = self.predictions[name]
-            auc_score = roc_auc_score(self.y_test, probs)
-            prec_pts, rec_pts, _ = precision_recall_curve(self.y_test, probs)
-            pr_auc = auc(rec_pts, prec_pts)
+        perf_summary = {}
+        for name, (mod, x_eval) in models_dict.items():
+            probs = mod.predict_proba(x_eval)[:, 1]
+            preds = mod.predict(x_eval)
+            p_pts, r_pts, _ = precision_recall_curve(self.y_test, probs)
+            cm = confusion_matrix(self.y_test, preds)
+            tn, fp, fn, tp = cm.ravel()
+            specificity = tn / (tn + fp)
             
-            results[name] = {
-                "ROC-AUC": round(auc_score, 4),
-                "PR-AUC": round(pr_auc, 4),
-                "F1-Score": round(f1_score(self.y_test, preds), 4),
+            perf_summary[name] = {
+                "CV_ROC_AUC": f"{cv_scores[name][0]:.4f} +/- {cv_scores[name][1]:.4f}",
+                "Holdout_ROC_AUC": round(roc_auc_score(self.y_test, probs), 4),
+                "PR_AUC": round(auc(r_pts, p_pts), 4),
+                "F1_Score": round(f1_score(self.y_test, preds), 4),
                 "Precision": round(precision_score(self.y_test, preds), 4),
-                "Recall": round(recall_score(self.y_test, preds), 4)
+                "Recall": round(recall_score(self.y_test, preds), 4),
+                "Specificity": round(specificity, 4),
+                "Confusion_Matrix": {"TN": int(tn), "FP": int(fp), "FN": int(fn), "TP": int(tp)}
             }
+        results["Model_Comparison"] = perf_summary
+        
+        # C. Feature Ablation Study (Klaim Kontribusi Ilmiah Indikator BPS)
+        ablation_subsets = {
+            "1. Financial/SPT Only": ["reported_turnover_spt_juta", "tax_paid_final_juta"],
+            "2. + Digital Transaction (Gateway & Vol)": [
+                "reported_turnover_spt_juta", "tax_paid_final_juta",
+                "gmv_transaksi_juta", "annual_order_volume", "avg_ticket_size_ribu", "digital_payment_ratio"
+            ],
+            "3. + Logistics & Supply Chain": [
+                "reported_turnover_spt_juta", "tax_paid_final_juta",
+                "gmv_transaksi_juta", "annual_order_volume", "avg_ticket_size_ribu", "digital_payment_ratio",
+                "logistics_tracking_ratio", "customer_return_rate"
+            ],
+            "4. Full Model (+ BPS Contextual Macro)": self.feature_cols
+        }
+        
+        ablation_summary = {}
+        for subset_name, cols in ablation_subsets.items():
+            sub_xgb = xgb.XGBClassifier(
+                n_estimators=bp["n_estimators"], learning_rate=bp["lr"],
+                max_depth=bp["max_depth"], subsample=bp["subsample"],
+                colsample_bytree=bp["colsample"], random_state=SEED, eval_metric="logloss"
+            )
+            sub_xgb.fit(self.X_train[cols], self.y_train)
+            sub_probs = sub_xgb.predict_proba(self.X_test[cols])[:, 1]
+            sub_preds = sub_xgb.predict(self.X_test[cols])
+            p_pts, r_pts, _ = precision_recall_curve(self.y_test, sub_probs)
             
-        # 1. ROC Curves
-        plt.figure(figsize=(7, 5), dpi=300)
-        for name, probs in self.probabilities.items():
-            fpr, tpr, _ = roc_curve(self.y_test, probs)
-            score = results[name]["ROC-AUC"]
-            plt.plot(fpr, tpr, label=f"{name} (AUC = {score:.4f})")
-        plt.plot([0, 1], [0, 1], "k--", alpha=0.4)
-        plt.xlabel("False Positive Rate")
-        plt.ylabel("True Positive Rate")
-        plt.title("ROC Curves: Model Evaluation on Holdout Test Set")
-        plt.legend(loc="lower right")
-        plt.tight_layout()
-        plt.savefig(os.path.join(self.images_dir, "figure1_roc_auc_curve.png"))
-        plt.close()
+            # Decile top 20% gain
+            gdf = pd.DataFrame({"y": self.y_test, "p": sub_probs})
+            gdf["decile"] = 10 - pd.qcut(gdf["p"], q=10, labels=False, duplicates="drop")
+            top20_gain = gdf[gdf["decile"] <= 2]["y"].sum() / gdf["y"].sum() * 100.0
+            
+            ablation_summary[subset_name] = {
+                "ROC_AUC": round(roc_auc_score(self.y_test, sub_probs), 4),
+                "PR_AUC": round(auc(r_pts, p_pts), 4),
+                "F1_Score": round(f1_score(self.y_test, sub_preds), 4),
+                "Top20_Decile_Gain_Pct": round(top20_gain, 2)
+            }
+        results["Ablation_Study"] = ablation_summary
         
-        # 2. Cumulative Decile Gains
-        best_probs = self.probabilities[self.best_model_name]
-        gains_df = pd.DataFrame({"y_true": self.y_test, "prob": best_probs})
-        gains_df["decile"] = pd.qcut(gains_df["prob"], q=10, labels=False, duplicates="drop")
-        gains_df["decile"] = 10 - gains_df["decile"]
+        # D. Geographical Out-of-Province Generalization (Robustness Test)
+        # Train on 8 provinces, Test on 2 holdout unseen provinces (Bali & Sulawesi Selatan)
+        holdout_provinces = ["Bali", "Sulawesi Selatan"]
+        train_geo_df = self.df[~self.df["provinsi"].isin(holdout_provinces)]
+        test_geo_df = self.df[self.df["provinsi"].isin(holdout_provinces)]
         
-        decile_summary = gains_df.groupby("decile")["y_true"].sum().reset_index()
-        decile_summary["cum_gains"] = decile_summary["y_true"].cumsum()
-        decile_summary["cum_gains_pct"] = decile_summary["cum_gains"] / decile_summary["y_true"].sum() * 100.0
+        geo_xgb = xgb.XGBClassifier(
+            n_estimators=bp["n_estimators"], learning_rate=bp["lr"],
+            max_depth=bp["max_depth"], subsample=bp["subsample"],
+            colsample_bytree=bp["colsample"], random_state=SEED, eval_metric="logloss"
+        )
+        geo_xgb.fit(train_geo_df[self.feature_cols], train_geo_df[self.target_col])
+        geo_probs = geo_xgb.predict_proba(test_geo_df[self.feature_cols])[:, 1]
+        geo_preds = geo_xgb.predict(test_geo_df[self.feature_cols])
+        p_pts, r_pts, _ = precision_recall_curve(test_geo_df[self.target_col], geo_probs)
         
-        plt.figure(figsize=(7, 5), dpi=300)
-        plt.plot(decile_summary["decile"], decile_summary["cum_gains_pct"], marker="o", color="#b91c1c", label="AutoML Model Gains")
-        plt.plot([1, 10], [10, 100], "k--", alpha=0.4, label="Random Audit Baseline")
-        plt.xlabel("Decile (1 = Highest Predicted Risk, 10 = Lowest)")
-        plt.ylabel("Cumulative Identified Non-Compliant Taxpayers (%)")
-        plt.title("Cumulative Audit Yield by Risk Decile")
-        plt.xticks(range(1, 11))
-        plt.grid(True, linestyle=":", alpha=0.5)
-        plt.legend()
-        plt.tight_layout()
-        plt.savefig(os.path.join(self.images_dir, "figure2_cumulative_gains_decile.png"))
-        plt.close()
+        results["Geographical_Holdout_Test"] = {
+            "Unseen_Provinces": holdout_provinces,
+            "Train_Samples": len(train_geo_df),
+            "Test_Samples": len(test_geo_df),
+            "Holdout_ROC_AUC": round(roc_auc_score(test_geo_df[self.target_col], geo_probs), 4),
+            "Holdout_PR_AUC": round(auc(r_pts, p_pts), 4),
+            "Holdout_F1_Score": round(f1_score(test_geo_df[self.target_col], geo_preds), 4)
+        }
         
-        # 3. SHAP Feature Importance & Interpretability (Anti-Black-Box)
-        explainer = shap.TreeExplainer(self.best_model)
-        shap_values = explainer(self.X_test)
-        
-        plt.figure(figsize=(8, 5), dpi=300)
-        shap.summary_plot(shap_values, self.X_test, show=False)
-        plt.title("SHAP Feature Importance: Explaining Tax Compliance Risk Factors")
-        plt.tight_layout()
-        plt.savefig(os.path.join(self.images_dir, "figure3_shap_feature_importance.png"))
-        plt.close()
-        
-        # 4. Confusion Matrix Normalized
-        cm = confusion_matrix(self.y_test, self.predictions[self.best_model_name], normalize='true')
-        plt.figure(figsize=(6, 5), dpi=300)
-        sns.heatmap(cm, annot=True, fmt=".2%", cmap="Blues", cbar=False,
-                    xticklabels=["Patuh (0)", "Berisiko (1)"],
-                    yticklabels=["Patuh (0)", "Berisiko (1)"])
-        plt.xlabel("Prediksi Model")
-        plt.ylabel("Kondisi Riil")
-        plt.title("Normalized Confusion Matrix: AutoML Risk Classifier")
-        plt.tight_layout()
-        plt.savefig(os.path.join(self.images_dir, "figure4_confusion_matrix.png"))
-        plt.close()
-        
-        top20_pct = float(decile_summary.loc[decile_summary["decile"] <= 2, "cum_gains_pct"].max())
-        results["top20_decile_gain_pct"] = round(top20_pct, 2)
         return results
 
 if __name__ == "__main__":
-    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    data = os.path.join(base, "data", "bps_e_commerce_tax_compliance.csv")
-    pipeline = TaxComplianceAutoMLPipeline(data_path=data, output_dir=base)
-    pipeline.run_baselines()
-    pipeline.optimize_automl(n_trials=30)
-    summary = pipeline.evaluate_and_plot()
-    print(json.dumps(summary, indent=2))
+    data_file = os.path.join(os.path.dirname(__file__), "..", "data", "bps_e_commerce_tax_compliance.csv")
+    pipeline = RobustTaxCompliancePipeline(data_file)
+    res = pipeline.run_all_evaluations()
+    print(json.dumps(res, indent=2))
