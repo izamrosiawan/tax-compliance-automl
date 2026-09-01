@@ -8,16 +8,16 @@
 ---
 
 ### ABSTRAK
-Pertumbuhan perniagaan elektronik di Indonesia menimbulkan tantangan pengawasan bagi Direktorat Jenderal Pajak (DJP), khususnya dalam memverifikasi kewajaran pelaporan peredaran usaha (*self-assessment*) pedagang daring. Mengingat adanya batasan kerahasiaan data perpajakan individual (*taxpayer confidentiality*), penelitian ini merancang sebuah kerangka kerja tolok ukur simulasi (*synthetic simulation benchmark*) yang dirancang secara murni non-sirkular. Target temuan audit dibangkitkan 100% dari variabel laten tak teramati (perilaku *cash skimming*, distorsi inventaris, dan anomali logistik), sedangkan data yang diamati model (*observable features*) diperlakukan sebagai proksi bernoise (*noisy proxies*). Melalui eksperimen terhadap 5.000 data observasi dengan prevalensi dasar (*base rate*) risiko sebesar 25,0% dan skema validasi silang berstrata 5-Fold ($\text{seed}=42$), kami mengevaluasi kemampuan pemeringkatan risiko (*risk ranking*) dari empat model: *Logistic Regression*, *Random Forest*, *LightGBM*, dan *AutoML XGBoost* yang dioptimasi menggunakan *Tree-structured Parzen Estimator* (TPE). Studi ablasi fitur menunjukkan bahwa pelaporan SPT mandiri semata memiliki daya pembeda yang sangat terbatas (ROC-AUC $0,5641$, 95% CI $[0,5281, 0,5994]$). Penambahan data transaksi digital dan logistik secara substansial meningkatkan performa pemeringkatan menjadi ROC-AUC $0,7667$ ($95\%$ CI $[0,7329, 0,7998]$) dan PR-AUC $0,5455$ (sekitar 2,18 kali lipat di atas garis dasar prevalensi $0,2500$). Penambahan indikator makro terkalibrasi BPS memberikan kontribusi kontekstual marginal (ROC-AUC $0,7684$) dengan tangkapan temuan pada kelompok risiko 20% teratas (*Top-20% Risk Yield*) sebesar $45,2\%$ (*cumulative lift* $2,26\times$). Model linier *Logistic Regression* menghasilkan ROC-AUC tertinggi ($0,7856$, 95% CI $[0,7529, 0,8168]$) yang konsisten dengan kompleksitas model yang lebih rendah pada struktur proksi teramati, sementara *AutoML XGBoost* berperan sebagai pembanding nonlinier utama ($0,7682$, 95% CI $[0,7346, 0,8011]$). Uji ketahanan spasial berulang (*repeated geographical holdout*) menghasilkan bukti ketahanan spasial awal dengan rata-rata ROC-AUC sebesar $0,7643 \pm 0,0321$, dan analisis sensitivitas DGP mengonfirmasi stabilitas pemeringkatan lintas variasi bobot parameter laten. Analisis SHAP mendeskripsikan kontribusi relatif fitur masukan terhadap skor prediksi tanpa mengasumsikan hubungan kausalitas langsung. Kerangka kerja ini menunjukkan nilai tambah empiris integrasi data pihak ketiga dalam lingkungan simulasi serta menyediakan arsitektur sistem pendukung keputusan (*decision support system*) yang mendukung prinsip akuntabilitas tata kelola pemrosesan data.
+Pertumbuhan perniagaan elektronik di Indonesia menimbulkan tantangan pengawasan bagi Direktorat Jenderal Pajak (DJP), khususnya dalam memverifikasi kewajaran pelaporan peredaran usaha (*self-assessment*) pedagang daring. Mengingat adanya batasan kerahasiaan data perpajakan individual (*taxpayer confidentiality*), penelitian ini merancang sebuah kerangka kerja tolok ukur simulasi (*synthetic simulation benchmark*) yang dirancang secara murni non-sirkular. Target temuan audit dibangkitkan 100% dari variabel laten tak teramati (perilaku *cash skimming*, distorsi inventaris, dan anomali logistik), sedangkan data yang diamati model (*observable features*) diperlakukan sebagai proksi bernoise (*noisy proxies*). Melalui eksperimen terhadap 5.000 data observasi dengan prevalensi dasar (*base rate*) risiko sebesar 25,0% dan skema validasi silang berstrata 5-Fold ($\text{seed}=42$), kami mengevaluasi kemampuan pemeringkatan risiko (*risk ranking*) dari empat model: *Logistic Regression*, *Random Forest*, *LightGBM*, dan *TPE-optimized XGBoost* yang dioptimasi menggunakan *Tree-structured Parzen Estimator* (TPE). Studi ablasi fitur menunjukkan bahwa pelaporan SPT mandiri semata memiliki daya pembeda yang sangat terbatas (ROC-AUC $0,5641$, 95% CI $[0,5281, 0,5994]$). Penambahan data transaksi digital dan logistik secara substansial meningkatkan performa pemeringkatan menjadi ROC-AUC $0,7667$ ($95\%$ CI $[0,7329, 0,7998]$) dan PR-AUC $0,5455$ (sekitar 2,18 kali lipat di atas garis dasar prevalensi $0,2500$). Penambahan indikator makro terkalibrasi BPS memberikan kontribusi kontekstual marginal (ROC-AUC $0,7684$) dengan tangkapan temuan pada kelompok risiko 20% teratas (*Top-20% Risk Yield*) sebesar $45,2\%$ (*cumulative lift* $2,26\times$). Model linier *Logistic Regression* menghasilkan ROC-AUC tertinggi ($0,7856$, 95% CI $[0,7529, 0,8168]$) yang konsisten dengan kompleksitas model yang lebih rendah pada struktur proksi teramati, sementara *TPE-optimized XGBoost* berperan sebagai pembanding nonlinier utama ($0,7682$, 95% CI $[0,7346, 0,8011]$). Uji ketahanan spasial berulang (*repeated geographical holdout*, $R=5$ pasangan provinsi) menghasilkan bukti ketahanan spasial awal dengan rata-rata ROC-AUC sebesar $0,7643 \pm 0,0321$, dan analisis sensitivitas DGP menunjukkan kestabilan relatif struktur pemeringkatan lintas variasi bobot parameter laten. Analisis SHAP mendeskripsikan kontribusi relatif fitur masukan berdasarkan *mean absolute SHAP* tanpa mengasumsikan hubungan kausalitas langsung. Kerangka kerja ini menunjukkan nilai tambah empiris integrasi data pihak ketiga dalam lingkungan simulasi serta menyediakan arsitektur sistem pendukung keputusan (*decision support system*) yang mendukung prinsip akuntabilitas tata kelola pemrosesan data.
 
-**Kata Kunci:** Ablation Study, Compliance Risk Management, Data Generating Process, Indikator BPS, Pajak Digital, Risk Ranking, Synthetic Benchmark.
+**Kata Kunci:** Ablation Study, Compliance Risk Management, Data Generating Process, Indikator BPS, Pajak Digital, Risk Ranking, Synthetic Benchmark, TPE-optimized XGBoost.
 
 ---
 
 ### ABSTRACT
-*The expansion of electronic commerce in Indonesia presents monitoring hurdles for the Directorate General of Taxes (DGT), particularly in assessing the plausibility of self-reported turnover. Constrained by statutory taxpayer confidentiality, this paper develops a non-circular synthetic simulation benchmark. Ground-truth audit outcomes are generated exclusively from unobserved latent states (cash skimming propensity, inventory distortion, and logistics deviations), while observed input features serve as noisy empirical proxies. Across 5,000 simulated merchant profiles with a 25.0% baseline risk prevalence under 5-fold stratified cross-validation (seed=42), we benchmark the risk-ranking capabilities of Logistic Regression, Random Forest, LightGBM, and an Optuna-optimized AutoML XGBoost model. A feature ablation study shows that self-reported tax returns alone exhibit limited discriminatory power (ROC-AUC 0.5641, 95% CI [0.5281, 0.5994]). Progressively integrating digital transaction volumes and logistics tracking substantially improves ranking quality to ROC-AUC 0.7667 (95% CI [0.7329, 0.7998]) and PR-AUC 0.5455 (approximately 2.18x above the 0.2500 prevalence baseline). Incorporating BPS-calibrated provincial macro indicators provides marginal contextual information (ROC-AUC 0.7684) with a top-20% risk yield of 45.2% (2.26x cumulative lift). Logistic Regression delivers the highest holdout ROC-AUC (0.7856, 95% CI [0.7529, 0.8168]), consistent with lower model complexity on the near-linear proxy structure, alongside non-linear AutoML models (0.7682, 95% CI [0.7346, 0.8011]). Repeated geographical holdout validation across unseen provinces provides evidence of spatial robustness (mean ROC-AUC 0.7643 +/- 0.0321), and DGP sensitivity tests confirm structural stability across varied latent parameter weights. SHAP analysis illustrates predictive feature attributions without implying causal mechanisms. This benchmark provides an empirical framework for multi-source risk-based tax decision support aligning with algorithmic accountability principles.*
+*The expansion of electronic commerce in Indonesia presents monitoring hurdles for the Directorate General of Taxes (DGT), particularly in assessing the plausibility of self-reported turnover. Constrained by statutory taxpayer confidentiality, this paper develops a non-circular synthetic simulation benchmark. Ground-truth audit outcomes are generated exclusively from unobserved latent states (cash skimming propensity, inventory distortion, and logistics deviations), while observed input features serve as noisy empirical proxies. Across 5,000 simulated merchant profiles with a 25.0% baseline risk prevalence under 5-fold stratified cross-validation (seed=42), we benchmark the risk-ranking capabilities of Logistic Regression, Random Forest, LightGBM, and an Optuna-optimized TPE-XGBoost model. A feature ablation study shows that self-reported tax returns alone exhibit limited discriminatory power (ROC-AUC 0.5641, 95% CI [0.5281, 0.5994]). Progressively integrating digital transaction volumes and logistics tracking substantially improves ranking quality to ROC-AUC 0.7667 (95% CI [0.7329, 0.7998]) and PR-AUC 0.5455 (approximately 2.18x above the 0.2500 prevalence baseline). Incorporating BPS-calibrated provincial macro indicators provides marginal contextual information (ROC-AUC 0.7684) with a top-20% risk yield of 45.2% (2.26x cumulative lift). Logistic Regression delivers the highest holdout ROC-AUC (0.7856, 95% CI [0.7529, 0.8168]), consistent with lower model complexity on the near-linear proxy structure, alongside non-linear TPE-XGBoost models (0.7682, 95% CI [0.7346, 0.8011]). Repeated geographical holdout validation across unseen provinces (R=5 province pairs) provides evidence of spatial robustness (mean ROC-AUC 0.7643 +/- 0.0321), and DGP sensitivity tests demonstrate the relative stability of ranking structures across varied latent parameter weights. SHAP analysis illustrates predictive feature attributions based on mean absolute SHAP values without implying causal mechanisms. This benchmark provides an empirical framework for multi-source risk-based tax decision support aligning with algorithmic accountability principles.*
 
-**Keywords:** Ablation Study, Compliance Risk Management, Data Generating Process, BPS Indicators, Digital Taxation, Risk Ranking, Synthetic Benchmark.
+**Keywords:** Ablation Study, Compliance Risk Management, Data Generating Process, BPS Indicators, Digital Taxation, Risk Ranking, Synthetic Benchmark, TPE-optimized XGBoost.
 
 ---
 
@@ -34,7 +34,7 @@ Dalam kerangka *Compliance Risk Management* (CRM), otoritas pajak mengelompokkan
 Penelitian ini merumuskan kerangka tolok ukur simulasi non-sirkular untuk pemeringkatan risiko (*risk ranking*) kepatuhan pajak digital. Kontribusi utama penelitian ini meliputi:
 a. **Desain Target Laten Non-Sirkular:** Memisahkan secara tegas variabel laten tak teramati pembentuk label temuan audit dari fitur-fitur masukan teramati ($X$).
 b. **Studi Ablasi Fitur Bertahap:** Mengukur kontribusi marginal dari data pelaporan mandiri, transaksi digital, logistik, dan data makroekonomi terkalibrasi BPS dengan interval kepercayaan 95% (*95% Confidence Interval*).
-c. **Validasi Geografis Berulang (*Repeated Geographical Holdout*):** Menguji kemampuan generalisasi spasial model pada kelompok provinsi yang belum pernah dilihat dalam data latih.
+c. **Validasi Geografis Berulang (*Repeated Geographical Holdout*):** Menguji kemampuan generalisasi spasial model pada $R=5$ pasangan kelompok provinsi yang belum pernah dilihat dalam data latih.
 d. **Pemosisian Model sebagai Decision Support System:** Memposisikan model sebagai alat pemeringkat prioritas audit (*risk ranking*), didukung analisis keterbukaan SHAP yang mendukung prinsip akuntabilitas dalam tata kelola pemrosesan data.
 
 ---
@@ -44,8 +44,8 @@ d. **Pemosisian Model sebagai Decision Support System:** Memposisikan model seba
 ### 2.1 Informasi Pihak Ketiga dan Perilaku Kepatuhan
 Model kepatuhan pajak Allingham-Sandmo-Yitzhaki menempatkan wajib pajak sebagai agen ekonomi yang menimbang manfaat penghindaran pajak terhadap risiko terdeteksi (Alm & Malézieux, 2021). Kajian empiris oleh Kleven et al. (2011) serta Slemrod (2019) membuktikan bahwa ketersediaan laporan informasi pihak ketiga (*third-party information reporting*) secara substansial menekan peluang ketidakpatuhan. Pada ekosistem digital, integrasi data transaksi perbankan dan resi pengiriman barang menjadi instrumen verifikasi silang paling efektif (Naritomi, 2019).
 
-### 2.2 Machine Learning, AutoML, dan Interpretabilitas Model
-Penerapan algoritma machine learning telah banyak dieksplorasi untuk mendeteksi anomali pada data keuangan dan kepabeanan (de Roux et al., 2018; Kim et al., 2020; Battaglini et al., 2022). *Automated Machine Learning* (AutoML) dengan algoritma *Tree-structured Parzen Estimator* (TPE) mengotomatiskan pencarian konfigurasi hyperparameter berdasarkan pendekatan Bayesian (Bergstra et al., 2011; Feurer et al., 2019).
+### 2.2 Machine Learning, Optimasi Hyperparameter TPE, dan Interpretabilitas Model
+Penerapan algoritma machine learning telah banyak dieksplorasi untuk mendeteksi anomali pada data keuangan dan kepabeanan (de Roux et al., 2018; Kim et al., 2020; Battaglini et al., 2022). Optimasi hyperparameter berbasis *Tree-structured Parzen Estimator* (TPE) mengotomatiskan pencarian konfigurasi hyperparameter berdasarkan pemodelan probabilitas kepadatan Bayesian non-parametrik (Bergstra et al., 2011; Feurer et al., 2019).
 
 Untuk memastikan transparansi keputusan, metode *SHapley Additive exPlanations* (SHAP) memberikan estimasi kontribusi fitur masukan terhadap nilai prediksi (Lundberg & Lee, 2017):
 
@@ -63,8 +63,8 @@ Tabel 1 menyajikan posisi penelitian ini dalam literatur machine learning perpaj
 | de Roux et al. (2018) | Kecurangan PPh Badan (Kolombia) | SPT & Laporan Keuangan | Unsupervised ML, Isolation Forest | Precision@K, ROC-AUC | Tidak memasukkan variabel logistik dan indikator makro wilayah | Menambahkan variabel logistik pihak ketiga dan indikator regional terkalibrasi BPS |
 | Kim et al. (2020) | Deteksi Penipuan Kepabeanan / WCO | Deklarasi impor & nilai barang | Dual Attentive Tree-aware Embedding (DATE) | Precision@K, Revenue Recall | Berfokus pada deklarasi pabean batas negara fisik | Mengadaptasi prinsip dual-proxy pada ekosistem perniagaan digital domestik |
 | Battaglini et al. (2022) | Audit Kepatuhan Pajak (Italia) | Data audit administratif fiskus | Supervised ML & Selective Labels | Detected Evasion Gain (+38%) | Penyetelan hyperparameter manual tanpa uji ketahanan spasial | Menggunakan optimasi Bayesian TPE dan validasi holdout geografis berulang |
-| DJP (2023) | Sistem CRM Pajak (Indonesia) | Data internal & ILAP | Aturan Matriks Heuristik | Realisasi Penerimaan | Model berbasis aturan statis rentan *false positive* | Membangun tolok ukur simulasi non-sirkular berbasis AutoML |
-| **Penelitian Ini (2026)** | **Benchmark Pajak Digital Indonesia** | **Simulasi Laten & Data Pihak Ketiga** | **AutoML XGBoost + Logistic + TPE + SHAP** | **ROC-AUC (95% CI), PR-AUC, Top-20% Yield, Geo-Holdout** | **-** | **Mengembangkan framework simulasi yang mengintegrasikan DGP variabel laten dengan repeated geographical holdout** |
+| DJP (2023) | Sistem CRM Pajak (Indonesia) | Data internal & ILAP | Aturan Matriks Heuristik | Realisasi Penerimaan | Model berbasis aturan statis rentan *false positive* | Membangun tolok ukur simulasi non-sirkular berbasis TPE-optimized ML |
+| **Penelitian Ini (2026)** | **Benchmark Pajak Digital Indonesia** | **Simulasi Laten & Data Pihak Ketiga** | **TPE-optimized XGBoost + Logistic + SHAP** | **ROC-AUC (95% CI), PR-AUC, Top-20% Yield, Geo-Holdout** | **-** | **Mengembangkan framework simulasi yang mengintegrasikan DGP variabel laten dengan repeated geographical holdout** |
 
 ---
 
@@ -83,7 +83,7 @@ Parameter numerik dalam proses pembangkitan data merupakan asumsi simulasi terst
 | $u_{\text{frac}}$ | Wajib Pajak (Perantara) | $\text{Clip}\left(0,40\delta_{\text{cash}} + 0,30\left(\frac{\delta_{\text{inv}}}{1+\delta_{\text{inv}}}\right) + \mathcal{N}(0,10, 0,10^2), 0, 0,85\right)$ | Intermediate Variable | **Tidak** |
 | $GMV_i$ | Wajib Pajak (Teramati) | $\text{Poisson}(\lambda=140)+20 \times \text{Lognormal}(\mu=4.8, \sigma=0.6) / 1000$ | Noisy Feature ($X$) | **Tidak** |
 | $SPT_i$ | Wajib Pajak (Teramati) | $GMV_i \times (1 - u_{\text{frac}})$ | Noisy Feature ($X$) | **Tidak** |
-| $TaxPaid_i$ | Wajib Pajak (Teramati) | $SPT_i \times 0,005$ (Asumsi PPh Final PP 55/2022) | Noisy Feature ($X$) | **Tidak** |
+| $TaxPaid_i$ | Wajib Pajak (Teramati) | $SPT_i \times 0,005$ (Deterministik dari SPT; PP 55/2022) | Noisy Feature ($X$, Baseline Admin) | **Tidak** |
 | $PayRatio_i$ | Wajib Pajak (Teramati) | $\text{Clip}\left(1.0 - (0.60\delta_{\text{cash}} + \mathcal{N}(0,20, 0,10^2)), 0.05, 0.99\right)$ | Noisy Feature ($X$) | **Tidak** |
 | $Logistics_i$ | Wajib Pajak (Teramati) | $\text{Clip}\left(1.0 - (0.50\delta_{\text{log}} + \mathcal{N}(0,15, 0,08^2)), 0.10, 1.00\right)$ | Noisy Feature ($X$) | **Tidak** |
 | $EComPct_p$ | Provinsi (Makro) | BPS Benchmark Calibration $\pm \mathcal{N}(0, 1.5)$ | Contextual Macro Feature ($X$) | **Tidak** |
@@ -92,6 +92,8 @@ Parameter numerik dalam proses pembangkitan data merupakan asumsi simulasi terst
 
 Formula pembentukan skor temuan audit laten adalah:
 $$S^*_{\text{audit}} = 0,40 \cdot \delta_{\text{cash}} + 0,35 \cdot \left(\frac{\delta_{\text{inv}}}{1 + \delta_{\text{inv}}}\right) + 0,25 \cdot \delta_{\text{log}} + \varepsilon_i, \quad \varepsilon_i \sim \mathcal{N}(0, 0,08^2)$$
+
+*Catatan redundansi administratif:* Variabel $TaxPaid_i$ dipertahankan dalam model sebagai representasi nilai nominal pembayaran pajak yang secara administratif diturunkan secara deterministik dari nilai SPT ($SPT_i \times 0,005$) untuk mensimulasikan kelengkapan atribut basis data perpajakan standar.
 
 Hubungan struktural antara variabel laten, fitur masukan teramati, dan proses klasifikasi diilustrasikan pada diagram berikut:
 
@@ -125,7 +127,7 @@ Gambar 1 menyajikan korelasi antar-fitur teramati.
 *Gambar 1. Matriks Korelasi Multivariat Fitur Terkalibrasi BPS dan Parameter Transaksi (300 DPI).*
 
 ### 3.2 Protokol Validasi dan Estimasi Interval Kepercayaan
-Data dibagi menjadi 80% data latih ($n=4.000$) dan 20% data uji independen ($n=1.000$). Optimasi Bayesian TPE dijalankan murni di dalam validasi silang berstrata 5-Fold pada data latih. Estimasi interval kepercayaan 95% (95% CI) dihitung menggunakan prosedur non-parametrik bootstrap ($B=500$ iterasi) yang dilakukan secara eksklusif pada pasangan prediksi probabilitas dan label data uji dengan bobot model yang telah dibekukan (*fixed trained model weights*).
+Data dibagi menjadi 80% data latih ($n=4.000$) dan 20% data uji independen ($n=1.000$). Optimasi hyperparameter TPE dijalankan murni di dalam validasi silang berstrata 5-Fold pada data latih. Estimasi interval kepercayaan 95% (95% CI) dihitung menggunakan prosedur non-parametrik bootstrap ($B=500$ iterasi) yang dilakukan secara eksklusif pada pasangan prediksi probabilitas dan label data uji dengan bobot model yang telah dibekukan (*fixed trained model weights*).
 
 ---
 
@@ -137,13 +139,13 @@ Tabel 3 merangkum performa model pada data uji independen ($n=1.000$, dengan gar
 **Tabel 3. Evaluasi Kinerja Model Klasifikasi dan Pemeringkatan Risiko ($n=1.000, \text{Base Rate} = 0,2500$)**
 
 | Model | ROC-AUC (95% CI) | PR-AUC (95% CI) | F1-Score | Precision | Recall | Specificity | Top-20% Risk Yield (%) | Cumulative Lift | Matriks Konfusi (TN/FP/FN/TP) |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | **Logistic Regression** | **0,7856 [0,7529, 0,8168]** | **0,5633 [0,4991, 0,6299]** | 0,3955 | 0,6514 | 0,2840 | 0,9493 | **47,6%** | **2,38x** | 712 / 38 / 179 / 71 |
 | Random Forest | 0,7572 [0,7219, 0,7901] | 0,5348 [0,4723, 0,5959] | 0,3164 | 0,6235 | 0,2120 | 0,9573 | 44,0% | $2,20\times$ | 718 / 32 / 197 / 53 |
 | LightGBM | 0,7413 [0,7073, 0,7755] | 0,4901 [0,4271, 0,5596] | 0,4386 | 0,6316 | 0,3360 | 0,9347 | 42,4% | $2,12\times$ | 701 / 49 / 166 / 84 |
-| **AutoML XGBoost** | 0,7682 [0,7346, 0,8011] | 0,5496 [0,4804, 0,6128] | 0,3747 | 0,6018 | 0,2720 | 0,9400 | **45,6%** | **2,28x** | 705 / 45 / 182 / 68 |
+| **TPE-optimized XGBoost** | 0,7682 [0,7346, 0,8011] | 0,5496 [0,4804, 0,6128] | 0,3747 | 0,6018 | 0,2720 | 0,9400 | **45,6%** | **2,28x** | 705 / 45 / 182 / 68 |
 
-Pada Tabel 3, *Logistic Regression* menghasilkan skor ROC-AUC tertinggi ($0,7856$), yang konsisten dengan kompleksitas model yang lebih rendah pada struktur hubungan proksi yang relatif linier dalam DGP yang digunakan. *AutoML XGBoost* berperan penting sebagai model pembanding nonlinier utama ($0,7682$, 95% CI $[0,7346, 0,8011]$). Seluruh model memperoleh PR-AUC di atas garis dasar prevalensi $P(Y=1) = 0,2500$, di mana *Logistic Regression* mencatatkan PR-AUC sebesar $0,5633$ ($2,25\times$ base rate) dan *AutoML XGBoost* sebesar $0,5496$ ($2,20\times$ base rate).
+Pada Tabel 3, *Logistic Regression* menghasilkan skor ROC-AUC tertinggi ($0,7856$), yang konsisten dengan kompleksitas model yang lebih rendah pada struktur hubungan proksi yang relatif linier dalam DGP yang digunakan. *TPE-optimized XGBoost* berperan penting sebagai model pembanding nonlinier utama ($0,7682$, 95% CI $[0,7346, 0,8011]$). Seluruh model memperoleh PR-AUC di atas garis dasar prevalensi $P(Y=1) = 0,2500$, di mana *Logistic Regression* mencatatkan PR-AUC sebesar $0,5633$ ($2,25\times$ base rate) dan *TPE-optimized XGBoost* sebesar $0,5496$ ($2,20\times$ base rate).
 
 Fokus utama pemanfaatan model adalah **pemeringkatan probabilitas risiko (*risk ranking*)**, di mana pemeriksaan pada kelompok risiko 20% teratas berhasil menjaring **45,6% hingga 47,6% total ketidakpatuhan**. Kurva ROC dan PR disajikan pada Gambar 2 dan Gambar 3.
 
@@ -165,7 +167,7 @@ Dengan memprioritaskan pemeriksaan pada **Top 20% kelompok berisiko tertinggi (D
 Tabel 4 dan Gambar 5 menyajikan hasil evaluasi ablasi fitur.
 
 **Tabel 4. Hasil Studi Ablasi Fitur Menggunakan Model XGBoost**  
-*(Catatan: Hasil ablasi menggunakan model XGBoost secara konsisten di seluruh konfigurasi fitur; nilai ini tidak ekuivalen langsung dengan model regresi logistik terbaik pada Tabel 3).*
+*(Catatan metodologis: Evaluasi ablasi dijalankan dengan retraining model XGBoost secara terpisah pada setiap subset fitur menggunakan regularisasi default tanpa parameter subsample/colsample khusus pada Tabel 3, menghasilkan ROC-AUC model penuh sebesar 0,7684 yang selaras secara operasional dengan 0,7682 pada model utama Tabel 3).*
 
 | Konfigurasi Fitur | ROC-AUC | PR-AUC (vs Base 0,25) | Top-20% Risk Yield (%) | Cumulative Lift | Temuan Empiris |
 | :--- | :---: | :---: | :---: | :---: | :--- |
@@ -188,7 +190,7 @@ Gambar 6 menampilkan distribusi nilai SHAP global pada model XGBoost.
 ![SHAP Beeswarm Plot](/images/figure6_shap_beeswarm.png)  
 *Gambar 6. Distribusi Nilai SHAP: Kontribusi Fitur terhadap Prediksi Risiko (300 DPI).*
 
-Nilai SHAP mengonfirmasi bahwa rasio pembayaran digital dan keterlacakan logistik merupakan variabel dengan kontribusi prediktif tertinggi dalam model tanpa mengindikasikan hubungan kausalitas murni.
+Berdasarkan metrik *mean absolute SHAP value* ($\text{mean}(|\text{SHAP}|)$), rasio pembayaran digital dan keterlacakan logistik terkonfirmasi sebagai variabel dengan atribusi prediktif tertinggi dalam model tanpa mengindikasikan hubungan kausalitas murni.
 
 ### 4.5 Evaluasi Matriks Konfusi
 Gambar 7 menampilkan matriks konfusi ternormalisasi pada data uji independen.
@@ -201,7 +203,8 @@ Spesifisitas sebesar **$94,0\%$** menunjukkan tingkat *false-positive rate* yang
 ### 4.6 Uji Ketahanan Spasial dan Sensitivitas Bobot DGP
 Tabel 5 dan Gambar 8 merangkum hasil uji sensitivitas model terhadap variasi bobot parameter laten dan ketahanan spasial.
 
-**Tabel 5. Hasil Uji Sensitivitas Spesifikasi Parameter Bobot Laten DGP**
+**Tabel 5. Hasil Uji Sensitivitas Spesifikasi Parameter Bobot Laten DGP**  
+*(Catatan metodologis: Setiap skenario sensitivitas dibangkitkan sebagai eksperimen replikasi independen berbasis generator random state lokal; oleh karena itu, nilai ROC-AUC Skenario A [0,7804] tidak dimaksudkan sebagai replikasi numerik identik terhadap dataset utama Tabel 3 [0,7856]).*
 
 | Skenario Bobot Laten DGP $(\delta_{\text{cash}} / \delta_{\text{inv}} / \delta_{\text{log}})$ | Karakteristik Skenario | Logistic Regression ROC-AUC | XGBoost ROC-AUC |
 | :--- | :--- | :---: | :---: |
@@ -210,16 +213,16 @@ Tabel 5 dan Gambar 8 merangkum hasil uji sensitivitas model terhadap variasi bob
 | **Skenario C (0,30 / 0,25 / 0,45)** | Dominan Anomali Logistik | 0,7681 | 0,7648 |
 
 ![Uji Ketahanan Spasial](/images/figure8_geographical_holdout.png)  
-*Gambar 8. Evaluasi Ketahanan Spasial Lintas Pasangan Provinsi Holdout (300 DPI).*
+*Gambar 8. Evaluasi Ketahanan Spasial Lintas $R=5$ Pasangan Provinsi Holdout (300 DPI).*
 
-Validasi geografis berulang lintas pasangan provinsi holdout pada Gambar 8 menghasilkan bukti ketahanan spasial awal dengan skor rata-rata **$0,7643 \pm 0,0321$**. Hasil pada Tabel 5 menunjukkan bahwa urutan keunggulan integrasi fitur tetap konsisten di bawah berbagai variasi bobot parameter laten.
+Validasi geografis berulang lintas $R=5$ pasangan provinsi holdout pada Gambar 8 menghasilkan bukti ketahanan spasial awal dengan skor rata-rata **$0,7643 \pm 0,0321$**. Hasil pada Tabel 5 menunjukkan kestabilan relatif struktur pemeringkatan lintas variasi bobot parameter laten.
 
 ---
 
 ## 5. KESIMPULAN DAN REKOMENDASI
 
 ### 5.1 Kesimpulan
-Penelitian ini merumuskan kerangka tolok ukur simulasi non-sirkular yang memisahkan variabel laten temuan audit dari fitur-fitur masukan teramati. Studi ablasi menunjukkan bahwa pelaporan mandiri wajib pajak memiliki keterbatasan daya pembeda (ROC-AUC $0,5641$), sedangkan integrasi data gerbang pembayaran dan logistik secara substansial meningkatkan kualitas pemeringkatan risiko (ROC-AUC $0,7667$ dan Top-20% Risk Yield $46,0\%$). Indikator makro terkalibrasi BPS memberikan peran kontekstual wilayah yang stabil. Model linier *Logistic Regression* memberikan kinerja diskriminasi tertinggi ($0,7856$) yang konsisten dengan kompleksitas model yang lebih rendah pada struktur hubungan linear dalam DGP, sementara *AutoML XGBoost* menyediakan alternatif nonlinier yang kompetitif ($0,7682$). Validasi spasial berulang memberikan indikasi ketahanan spasial awal lintas provinsi ($0,7643 \pm 0,0321$), dan uji sensitivitas DGP mengonfirmasi stabilitas struktur pemeringkatan. Analisis SHAP memberikan transparansi atribusi prediktif guna mendukung tata kelola AI yang akuntabel.
+Penelitian ini merumuskan kerangka tolok ukur simulasi non-sirkular yang memisahkan variabel laten temuan audit dari fitur-fitur masukan teramati. Studi ablasi menunjukkan bahwa pelaporan mandiri wajib pajak memiliki keterbatasan daya pembeda (ROC-AUC $0,5641$), sedangkan integrasi data gerbang pembayaran dan logistik secara substansial meningkatkan kualitas pemeringkatan risiko (ROC-AUC $0,7667$ dan Top-20% Risk Yield $46,0\%$). Indikator makro terkalibrasi BPS memberikan peran kontekstual wilayah yang stabil. Model linier *Logistic Regression* memberikan kinerja diskriminasi tertinggi ($0,7856$) yang konsisten dengan kompleksitas model yang lebih rendah pada struktur hubungan linear dalam DGP, sementara *TPE-optimized XGBoost* menyediakan alternatif nonlinier yang kompetitif ($0,7682$). Validasi spasial berulang lintas $R=5$ pasangan provinsi memberikan indikasi ketahanan spasial awal ($0,7643 \pm 0,0321$), dan uji sensitivitas DGP menunjukkan kestabilan relatif struktur pemeringkatan. Analisis SHAP berbasis *mean absolute SHAP* memberikan transparansi atribusi prediktif guna mendukung tata kelola AI yang akuntabel.
 
 ### 5.2 Rekomendasi Kebijakan
 a. **Interoperabilitas Data Transaksi dan Logistik:** Memprioritaskan penguatan integrasi data pihak ketiga (perbankan, gerbang pembayaran, dan ekspedisi logistik) sebagai pilar utama pengawasan kepatuhan ekonomi digital.
