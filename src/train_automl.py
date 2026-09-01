@@ -13,8 +13,8 @@ from sklearn.metrics import (
 )
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import RandomizedSearchCV
 import lightgbm as lgb
-from flaml import AutoML
 
 # 1. Obey Deterministic Seed & Anti-Leakage Rules
 SEED = 42
@@ -73,20 +73,26 @@ def run_tax_compliance_automl_pipeline():
     
     print(f"Random Forest -> ROC-AUC: {auc_rf:.4f} | PR-AUC: {pr_auc_rf:.4f} | F1: {f1_rf:.4f}")
     
-    # 5. Model 3: AutoML (FLAML LightGBM)
-    print("\n=== 4. TRAINING AUTOMATED MACHINE LEARNING (FLAML AUTOML) ===")
-    automl = AutoML()
-    automl_settings = {
-        "time_budget": 30,  # 30 seconds search
-        "metric": "roc_auc",
-        "task": "classification",
-        "seed": SEED,
-        "verbose": 0
+    # 5. Model 3: AutoML (LightGBM Hyperparameter Search Engine)
+    print("\n=== 4. TRAINING AUTOMATED MACHINE LEARNING (LIGHTGBM SEARCH) ===")
+    param_dist = {
+        'n_estimators': [50, 100, 150, 200],
+        'learning_rate': [0.01, 0.03, 0.05, 0.1],
+        'num_leaves': [15, 31, 63],
+        'max_depth': [3, 5, 7, -1],
+        'subsample': [0.6, 0.8, 1.0],
+        'colsample_bytree': [0.6, 0.8, 1.0]
     }
-    automl.fit(X_train=X_train, y_train=y_train, **automl_settings)
+    lgb_base = lgb.LGBMClassifier(random_state=SEED, verbose=-1)
+    automl = RandomizedSearchCV(
+        lgb_base, param_distributions=param_dist, n_iter=25, 
+        scoring='roc_auc', cv=5, random_state=SEED, n_jobs=-1
+    )
+    automl.fit(X_train, y_train)
     
-    y_pred_automl_prob = automl.predict_proba(X_test)[:, 1]
-    y_pred_automl = automl.predict(X_test)
+    best_lgb = automl.best_estimator_
+    y_pred_automl_prob = best_lgb.predict_proba(X_test)[:, 1]
+    y_pred_automl = best_lgb.predict(X_test)
     
     auc_automl = roc_auc_score(y_test, y_pred_automl_prob)
     precision_automl_pts, recall_automl_pts, _ = precision_recall_curve(y_test, y_pred_automl_prob)
@@ -95,7 +101,7 @@ def run_tax_compliance_automl_pipeline():
     prec_automl = precision_score(y_test, y_pred_automl)
     rec_automl = recall_score(y_test, y_pred_automl)
     
-    print(f"AutoML Best Model ({automl.best_estimator}) -> ROC-AUC: {auc_automl:.4f} | PR-AUC: {pr_auc_automl:.4f} | F1: {f1_automl:.4f}")
+    print(f"AutoML Best LightGBM -> ROC-AUC: {auc_automl:.4f} | PR-AUC: {pr_auc_automl:.4f} | F1: {f1_automl:.4f}")
     
     # 6. Save Plots (300 DPI for Academic Publication)
     print("\n=== 5. GENERATING PUBLICATION-GRADE PLOTS (300 DPI) ===")
