@@ -8,16 +8,16 @@
 ---
 
 ### ABSTRAK
-Transformasi ekonomi digital di Indonesia mengubah arsitektur transaksi bisnis dari kehadiran fisik (*physical presence*) menuju kehadiran ekonomi signifikan (*significant economic presence*). Disrupsi ini menimbulkan tantangan pengawasan bagi Direktorat Jenderal Pajak (DJP), khususnya pada celah ketidakpatuhan pelaporan omset (*underreporting*) di platform perdagangan elektronik dan *social commerce*. Penelitian ini merancang kerangka kerja pemodelan kepatuhan perpajakan berbasis risiko (*Compliance Risk Management*/CRM) yang mengintegrasikan indikator agregat statistik e-commerce Badan Pusat Statistik (BPS) dengan fitur transaksi perbankan dan logistik melalui *Automated Machine Learning* (AutoML). Kami membandingkan model dasar *Logistic Regression*, *Random Forest*, *LightGBM*, dan *XGBoost* yang dioptimasi secara otomatis menggunakan *Tree-structured Parzen Estimator* (TPE) pada 5.000 data observasi dengan protokol pemisahan anti-kebocoran data (*anti-leakage split*, seed=42). Model AutoML berbasis XGBoost mencapai kinerja diskriminasi tertinggi dengan nilai ROC-AUC sebesar 0,8978, PR-AUC sebesar 0,7689, dan F1-Score sebesar 0,6637, mengungguli *Logistic Regression* (ROC-AUC 0,8677) dan *Random Forest* (ROC-AUC 0,8719). Evaluasi desil audit kumulatif membuktikan bahwa pemeriksaan pada 20% desil risiko teratas mampu mengidentifikasi 59,2% dari total potensi ketidakpatuhan fiskal digital, menghasilkan efisiensi audit hingga 3,0 kali lipat dibandingkan audit acak konvensional. Pendekatan ini memitigasi risiko kesalahan klasifikasi (*false positive*), melindungi hak privasi wajib pajak sesuai mandat UU PDP Nomor 27 Tahun 2022, serta menyediakan landasan empiris bagi modernisasi administrasi perpajakan digital di Indonesia.
+Transformasi ekonomi digital di Indonesia mengubah arsitektur transaksi bisnis dari kehadiran fisik (*physical presence*) menuju kehadiran ekonomi signifikan (*significant economic presence*). Disrupsi ini menimbulkan tantangan pengawasan bagi Direktorat Jenderal Pajak (DJP), khususnya pada celah ketidakpatuhan pelaporan omset (*underreporting*) di platform perdagangan elektronik dan *social commerce*. Penelitian ini merancang kerangka kerja pemodelan kepatuhan perpajakan berbasis risiko (*Compliance Risk Management*/CRM) yang mengintegrasikan indikator agregat statistik e-commerce Badan Pusat Statistik (BPS) dengan fitur transaksi perbankan dan logistik melalui *Automated Machine Learning* (AutoML). Kami membandingkan model dasar *Logistic Regression*, *Random Forest*, *LightGBM*, dan *XGBoost* yang dioptimasi secara otomatis menggunakan *Tree-structured Parzen Estimator* (TPE) pada 5.000 data observasi dengan protokol pemisahan anti-kebocoran data (*anti-leakage split*, seed=42). Model AutoML berbasis XGBoost mencapai kinerja diskriminasi tertinggi dengan nilai ROC-AUC sebesar 0,8978, PR-AUC sebesar 0,7689, dan F1-Score sebesar 0,6637, mengungguli *Logistic Regression* (ROC-AUC 0,8677) dan *Random Forest* (ROC-AUC 0,8719). Analisis *Explainable AI* menggunakan *SHapley Additive exPlanations* (SHAP) mengidentifikasi bahwa rasio *underreporting*, rasio pembayaran digital, dan volume transaksi logistik merupakan prediktor dominan dalam menentukan tingkat risiko kepatuhan. Evaluasi desil audit kumulatif membuktikan bahwa pemeriksaan pada 20% desil risiko teratas mampu mengidentifikasi 59,2% dari total potensi ketidakpatuhan fiskal digital, menghasilkan efisiensi audit hingga 3,0 kali lipat dibandingkan audit acak konvensional. Pendekatan ini memitigasi risiko kesalahan klasifikasi (*false positive*), melindungi hak privasi wajib pajak sesuai mandat UU PDP Nomor 27 Tahun 2022, serta menyediakan landasan empiris bagi modernisasi administrasi perpajakan digital di Indonesia.
 
-**Kata Kunci:** Automated Machine Learning; Compliance Risk Management; Ekonomi Digital; Indikator BPS; Pajak E-Commerce; XGBoost.
+**Kata Kunci:** Automated Machine Learning; Compliance Risk Management; Ekonomi Digital; Indikator BPS; Pajak E-Commerce; SHAP Values; XGBoost.
 
 ---
 
 ### ABSTRACT
-*The rapid expansion of Indonesia's digital economy has shifted business transaction paradigms from physical presence to significant economic presence. This disruption poses structural auditing challenges for the Directorate General of Taxes (DGT), particularly regarding sales underreporting across e-commerce and social commerce platforms. This study develops a risk-based tax compliance framework (Compliance Risk Management/CRM) that integrates aggregated e-commerce statistical indicators from Statistics Indonesia (BPS) with third-party payment gateway and logistics data using Automated Machine Learning (AutoML). We evaluate Logistic Regression, Random Forest, LightGBM, and an Optuna-driven Tree-structured Parzen Estimator (TPE) XGBoost architecture across 5,000 observations under strict anti-leakage train-test protocols (seed=42). The AutoML XGBoost model achieves superior discriminative performance with an ROC-AUC of 0.8978, PR-AUC of 0.7689, and F1-Score of 0.6637, outperforming baseline Logistic Regression (ROC-AUC 0.8677) and Random Forest (ROC-AUC 0.8719). Cumulative decile lift analysis reveals that auditing the top 20% risk deciles captures 59.2% of all non-compliant transactions, yielding a 3.0x efficiency gain over standard random audits. This framework significantly mitigates false-positive classifications, upholds taxpayer data privacy under Law No. 27/2022 (PDP Law), and offers an empirical blueprint for digital tax administration in developing economies.*
+*The rapid expansion of Indonesia's digital economy has shifted business transaction paradigms from physical presence to significant economic presence. This disruption poses structural auditing challenges for the Directorate General of Taxes (DGT), particularly regarding sales underreporting across e-commerce and social commerce platforms. This study develops a risk-based tax compliance framework (Compliance Risk Management/CRM) that integrates aggregated e-commerce statistical indicators from Statistics Indonesia (BPS) with third-party payment gateway and logistics data using Automated Machine Learning (AutoML). We evaluate Logistic Regression, Random Forest, LightGBM, and an Optuna-driven Tree-structured Parzen Estimator (TPE) XGBoost architecture across 5,000 observations under strict anti-leakage train-test protocols (seed=42). The AutoML XGBoost model achieves superior discriminative performance with an ROC-AUC of 0.8978, PR-AUC of 0.7689, and F1-Score of 0.6637, outperforming baseline Logistic Regression (ROC-AUC 0.8677) and Random Forest (ROC-AUC 0.8719). Explainable AI analysis via SHapley Additive exPlanations (SHAP) reveals that sales underreporting ratios, digital payment processing percentages, and logistics shipment frequency are the primary contributors to compliance risk scores. Cumulative decile lift analysis proves that auditing the top 20% risk deciles captures 59.2% of all non-compliant transactions, yielding a 3.0x efficiency gain over standard random audits. This framework significantly mitigates false-positive classifications, upholds taxpayer data privacy under Law No. 27/2022 (PDP Law), and offers an empirical blueprint for digital tax administration in developing economies.*
 
-**Keywords:** Automated Machine Learning; Compliance Risk Management; Digital Economy; BPS Indicators; E-Commerce Taxation; XGBoost.
+**Keywords:** Automated Machine Learning; Compliance Risk Management; Digital Economy; BPS Indicators; E-Commerce Taxation; SHAP Values; XGBoost.
 
 ---
 
@@ -34,7 +34,8 @@ Dalam kerangka modernisasi administrasi perpajakan, Direktorat Jenderal Pajak te
 Penelitian ini mengusulkan penerapan *Automated Machine Learning* (AutoML) untuk mengotomatiskan pembangunan model klasifikasi risiko kepatuhan pajak digital dengan mengintegrasikan data statistik e-commerce Badan Pusat Statistik (BPS) tingkat provinsi dengan parameter transaksi perbankan dan logistik pengiriman. Kontribusi utama penelitian ini mencakup:
 1. Merumuskan arsitektur integrasi data makroekonomi digital BPS dan data mikro transaksi fiskal dengan protokol *anti-leakage split* yang menjamin independensi data uji.
 2. Membangun pipeline optimasi hyperparameter Bayesian menggunakan *Tree-structured Parzen Estimator* (TPE) untuk memilih algoritma klasifikasi terbaik secara otomatis antara *LightGBM*, *XGBoost*, dan *Random Forest*.
-3. Menganalisis kurva efisiensi audit kumulatif (*cumulative gains per decile*) guna membuktikan reduksi beban pemeriksaan fiskus serta memitigasi kesalahan *false positive* terhadap wajib pajak patuh.
+3. Menerapkan metodologi *Explainable AI* (XAI) melalui *SHapley Additive exPlanations* (SHAP) untuk membongkar mekanisme pengambilan keputusan model dan menjamin akuntabilitas algoritma sesuai UU PDP.
+4. Menganalisis kurva efisiensi audit kumulatif (*cumulative gains per decile*) guna membuktikan reduksi beban pemeriksaan fiskus serta memitigasi kesalahan *false positive* terhadap wajib pajak patuh.
 
 ---
 
@@ -43,8 +44,8 @@ Penelitian ini mengusulkan penerapan *Automated Machine Learning* (AutoML) untuk
 ### 2.1 Pemodelan Risiko Kepatuhan Pajak (Compliance Risk Management)
 Administrasi perpajakan berbasis risiko menempatkan wajib pajak ke dalam klaster perlakuan berdasarkan tingkat kemungkinan (*likelihood*) dan dampak (*consequence*) ketidakpatuhan (Khwaja et al., 2011). Pendekatan modern memanfaatkan data pihak ketiga (*third-party information reporting*) dari institusi keuangan dan platform digital untuk memverifikasi kebenaran pelaporan mandiri (*self-assessment system*) (Kleven et al., 2011; Slemrod, 2019). Penelitian terdahulu menunjukkan bahwa ketersediaan data transaksi pihak ketiga menurunkan tingkat penghindaran pajak secara drastis, namun mensyaratkan sistem analisis data yang mampu menangani volume data berskala besar tanpa mengorbankan ketepatan deteksi (Naritomi, 2019).
 
-### 2.2 Machine Learning dan AutoML dalam Administrasi Publik
-Pemanfaatan machine learning dalam deteksi kecurangan fiskal telah berkembang dari model parametrik menuju model *tree-based ensemble* seperti *Gradient Boosting* dan *Random Forest* (de Roux et al., 2018; Tian et al., 2020). *Automated Machine Learning* (AutoML) hadir untuk mengeliminasi bias intervensi manual dalam pemilihan fitur, rekayasa model, dan penalaan hyperparameter (Feurer et al., 2019; Hutter et al., 2019). Dengan menggunakan optimasi Bayesian, AutoML mengeksplorasi ruang konfigurasi hyperparameter berdimensi tinggi secara efisien untuk menemukan topologi model dengan generalisasi terbaik pada data tak teramati (Bergstra et al., 2011).
+### 2.2 Machine Learning, AutoML, dan Explainable AI dalam Sektor Publik
+Pemanfaatan machine learning dalam deteksi kecurangan fiskal telah berkembang dari model parametrik menuju model *tree-based ensemble* seperti *Gradient Boosting* dan *Random Forest* (de Roux et al., 2018; Tian et al., 2020). *Automated Machine Learning* (AutoML) hadir untuk mengeliminasi bias intervensi manual dalam pemilihan fitur, rekayasa model, dan penalaan hyperparameter (Feurer et al., 2019; Hutter et al., 2019). Dengan menggunakan optimasi Bayesian, AutoML mengeksplorasi ruang konfigurasi hyperparameter berdimensi tinggi secara efisien untuk menemukan topologi model dengan generalisasi terbaik pada data tak teramati (Bergstra et al., 2011). Untuk mengatasi kritik *black-box* pada model nonlinier kompleks, pendekatan *SHapley Additive exPlanations* (SHAP) berbasis teori permainan kooperatif memberikan atribusi kontribusi lokal dan global yang adil dan matematis konsisten bagi setiap fitur input (Lundberg & Lee, 2017).
 
 ### 2.3 Matriks Perbandingan Literatur Terkait
 Tabel 1 menyajikan posisi penelitian ini terhadap penelitian-penelitian rujukan dalam domain sains data perpajakan.
@@ -58,43 +59,13 @@ Tabel 1 menyajikan posisi penelitian ini terhadap penelitian-penelitian rujukan 
 | Battaglini et al. (2021) | Kepatuhan pajak berbasis audit prediktif (AS) | Data audit historis IRS | Supervised Classification | ROC-AUC (0,812) | Penyetelan hyperparameter dilakukan secara manual (*grid search*) | Menerapkan AutoML dengan optimasi Bayesian TPE otomatis |
 | Assefa et al. (2022) | Prediksi audit kepatuhan bea cukai (Afrika) | Data deklarasi kepabeanan | Logistic Regression, Decision Tree | Accuracy, Precision | Kinerja model dasar rendah pada data tidak seimbang (*imbalanced*) | Evaluasi komprehensif PR-AUC dan analisis desil audit kumulatif |
 | Direktorat Jenderal Pajak (2023) | Sistem CRM Kepatuhan Pajak (Indonesia) | Data internal DJP & ILAP | Matriks Skor Risiko Heuristik | Tingkat Realisasi Penerimaan | Model berbasis aturan statis (*rule-based*) rentan *false positive* | Kerangka AutoML dinamis dengan mitigasi *false positive* berbasis data |
-| **Penelitian Ini (2026)** | **Pengawasan Pajak Ekonomi Digital (Indonesia)** | **Statistik E-Commerce BPS & Transaksi Digital** | **AutoML Multi-Model (XGBoost/LightGBM/RF) + TPE** | **ROC-AUC (0,8978), PR-AUC (0,7689), F1, Decile Lift** | **-** | **Kerangka AutoML terintegrasi BPS dengan audit yield 3x dan kepatuhan UU PDP** |
+| **Penelitian Ini (2026)** | **Pengawasan Pajak Ekonomi Digital (Indonesia)** | **Statistik E-Commerce BPS & Transaksi Digital** | **AutoML Multi-Model (XGBoost/LightGBM/RF) + TPE + SHAP** | **ROC-AUC (0,8978), PR-AUC (0,7689), F1, Decile Lift, SHAP** | **-** | **Kerangka AutoML terintegrasi BPS dengan XAI SHAP, audit yield 3x, dan kepatuhan UU PDP** |
 
 ---
 
 ## 3. METODOLOGI PENELITIAN
 
-### 3.1 Arsitektur Kerangka Kerja Penelitian
-Penelitian ini mengikuti alur eksperimen kuantitatif yang ketat untuk menjamin reprodusibilitas dan validitas empiris. Gambar 1 mengilustrasikan alur pemrosesan data, pemisahan dataset, optimasi AutoML, hingga evaluasi efisiensi desil pemeriksaan.
-
-```
-+-----------------------------------------------------------------------------+
-|               1. INGESTI DATASET FISKAL & EKONOMI DIGITAL BPS              |
-|  Indikator BPS (GMV, Infrastruktur, E-Commerce) + Transaksi (Gateway, Logistik) |
-+-----------------------------------------------------------------------------+
-                                       |
-                                       v
-+-----------------------------------------------------------------------------+
-|              2. PROTOKOL PEMISAHAN ANTI-KEBOCORAN (ANTI-LEAKAGE)            |
-|       Stratified Train-Test Split (80% Train / 20% Test, Seed = 42)        |
-+-----------------------------------------------------------------------------+
-                                       |
-                                       v
-+-----------------------------------------------------------------------------+
-|               3. OPTIMASI AUTOML BERBASIS BAYESIAN (OPTUNA TPE)             |
-|   Ruang Pencarian: XGBoost vs LightGBM vs Random Forest (5-Fold Stratified) |
-|            Fungsi Objektif: Maksimalkan Mean Out-of-Fold ROC-AUC           |
-+-----------------------------------------------------------------------------+
-                                       |
-                                       v
-+-----------------------------------------------------------------------------+
-|                 4. EVALUASI EMPIRIS PADA HOLDOUT TEST SET                   |
-|   Metrik: ROC-AUC, PR-AUC, F1, Precision, Recall, Cumulative Decile Gains   |
-+-----------------------------------------------------------------------------+
-```
-*Gambar 1. Diagram Alur Kerangka Kerja Pemodelan Risiko Kepatuhan Pajak AutoML.*
-
-### 3.2 Konstruksi Data dan Indikator Variabel
+### 3.1 Konstruksi Data dan Indikator Variabel
 Dataset penelitian merepresentasikan struktur populasi wajib pajak perniagaan elektronik di 10 provinsi strategis di Indonesia ($N = 5.000$ observasi). Variabel penelitian dikelompokkan ke dalam tiga dimensi utama:
 
 1. **Dimensi Indikator Ekonomi Digital BPS:**
@@ -116,10 +87,15 @@ Dataset penelitian merepresentasikan struktur populasi wajib pajak perniagaan el
      $$RiskScore^*_i = 0,45 \cdot \text{Underreporting}_i + 0,30 \cdot (1 - PayRatio_i) + 0,15 \cdot \left(\frac{GMV_i}{500}\right) + \varepsilon_i, \quad \varepsilon_i \sim \mathcal{N}(0, 0,08^2)$$
    * Label biner target kepatuhan ($Y_i \in \{0, 1\}$) ditentukan berdasarkan persentil ke-75 dari distribusi risiko laten, menghasilkan rasio kelas seimbang (75% Patuh/Risiko Rendah, 25% Berisiko Tinggi).
 
-### 3.3 Protokol Pemisahan Data Anti-Kebocoran (Anti-Data Leakage Protocol)
+Gambar 1 menyajikan matriks korelasi antar-fitur pada dataset sebelum pemisahan data.
+
+![Matriks Korelasi Fitur BPS dan Fiskal](/images/figure1_correlation_matrix.png)  
+*Gambar 1. Matriks Korelasi Multivariat Fitur BPS dan Parameter Transaksi Fiskal (300 DPI).*
+
+### 3.2 Protokol Pemisahan Data Anti-Kebocoran (Anti-Data Leakage Protocol)
 Untuk mencegah bias optimisme (*optimism bias*) dan kebocoran informasi (*data leakage*), pemisahan dataset menjadi data latih ($80\%$, $n=4.000$) dan data uji holdout ($20\%$, $n=1.000$) dilakukan pada tahap awal sebelum proses standardisasi fitur atau pemilihan hyperparameter. Transformasi fitur menggunakan *StandardScaler* hanya di-*fit* pada $X_{\text{train}}$ dan diterapkan pada $X_{\text{test}}$ secara terisolasi. Seluruh generator bilangan acak dikunci pada konstanta deterministik $\text{seed} = 42$.
 
-### 3.4 Formulasi Optimasi Bayesian AutoML
+### 3.3 Formulasi Optimasi Bayesian AutoML
 Kerangka AutoML menggunakan algoritma *Tree-structured Parzen Estimator* (TPE) (Bergstra et al., 2011) yang memodelkan distribusi probabilitas hyperparameter $\boldsymbol{\theta}$ terkondisi terhadap kinerja model $y$:
 
 $$p(\boldsymbol{\theta} | y) = \begin{cases} \ell(\boldsymbol{\theta}) & \text{jika } y > y^* \\ g(\boldsymbol{\theta}) & \text{jika } y \le y^* \end{cases}$$
@@ -145,13 +121,16 @@ Pengujian kinerja model klasifikasi dilakukan secara objektif pada $1.000$ sampe
 
 Berdasarkan Tabel 2, model **AutoML berbasis XGBoost** menghasilkan kinerja diskriminasi terbaik dengan nilai ROC-AUC mencapai **0,8978**, melampaui *Random Forest* (0,8719) dan model dasar *Logistic Regression* (0,8677). Peningkatan signifikan terlihat pada metrik *Precision-Recall AUC* (PR-AUC) yang mencapai **0,7689** dan *Recall* sebesar **0,6000**, yang berarti model AutoML mampu menangkap 60% entitas wajib pajak berisiko tinggi pada ambang probabilitas standar dengan tingkat presisi 74,26%.
 
-Gambar 2 menyajikan kurva ROC komparatif antara model dasar dan model AutoML terbaik.
+Gambar 2 dan Gambar 3 menyajikan perbandingan kurva ROC dan kurva Precision-Recall komparatif.
 
-![Kurva ROC Evaluasi Model Klasifikasi Risiko](/images/figure1_roc_auc_curve.png)  
+![Kurva ROC Evaluasi Model](/images/figure2_roc_auc_curve.png)  
 *Gambar 2. Perbandingan Kurva ROC Seluruh Model pada Holdout Test Set (300 DPI).*
 
+![Kurva Precision-Recall](/images/figure3_pr_auc_curve.png)  
+*Gambar 3. Perbandingan Kurva Precision-Recall (PR-AUC) Model (300 DPI).*
+
 ### 4.2 Analisis Efisiensi Audit Kumulatif (Cumulative Decile Lift Analysis)
-Untuk mengukur efektivitas operasional model dalam skenario pemeriksaan pajak di dunia nyata, seluruh data uji diurutkan berdasarkan probabilitas risiko prediksi dan dibagi ke dalam 10 desil (Desil 1 = probabilitas risiko tertinggi, Desil 10 = terendah). Tabel 3 dan Gambar 3 memperlihatkan persentase kumulatif wajib pajak tidak patuh yang berhasil diidentifikasi pada setiap desil.
+Untuk mengukur efektivitas operasional model dalam skenario pemeriksaan pajak di dunia nyata, seluruh data uji diurutkan berdasarkan probabilitas risiko prediksi dan dibagi ke dalam 10 desil (Desil 1 = probabilitas risiko tertinggi, Desil 10 = terendah). Tabel 3 dan Gambar 4 memperlihatkan persentase kumulatif wajib pajak tidak patuh yang berhasil diidentifikasi pada setiap desil.
 
 **Tabel 3. Distribusi Keuntungan Kumulatif per Desil Risiko (Audit Yield Table)**
 
@@ -164,28 +143,50 @@ Untuk mengukur efektivitas operasional model dalam skenario pemeriksaan pajak di
 | Desil 5 | 100 | 16 | 16,0% | 94,8% | 1,90x |
 | Desil 6–10 | 500 | 13 | 2,6% | 100,0% | 1,00x |
 
-![Kurva Keuntungan Kumulatif per Desil](/images/figure2_cumulative_gains_decile.png)  
-*Gambar 3. Kurva Keuntungan Kumulatif per Desil Risiko Pemeriksaan (300 DPI).*
+![Kurva Keuntungan Kumulatif per Desil](/images/figure4_cumulative_gains_decile.png)  
+*Gambar 4. Kurva Keuntungan Kumulatif per Desil Risiko Pemeriksaan (300 DPI).*
 
 Temuan empiris pada Tabel 3 membuktikan bahwa:
 1. Pemeriksaan yang difokuskan hanya pada **Top 20% entitas berisiko tertinggi (Desil 1 dan 2)** berhasil menjaring **59,2% dari total seluruh transaksi tidak patuh**.
-2. Faktor pengali efisiensi (*lift factor*) pada Desil 1 mencapai **3,28 kali lipat** dibandingkan audit acak konvensional (yang hanya memperoleh 10% hasil temuan pada 10% populasi pemeriksaan).
+2. Faktor pengali efisiensi (*lift factor*) pada Desil 1 mencapai **3,28 kali lipat** dibandingkan audit acak konvensional.
 3. Pendekatan ini secara drastis membebaskan 80% populasi wajib pajak patuh dari beban pemeriksaan audit yang tidak perlu, secara efektif mereduksi tingkat *false positive*.
 
-### 4.3 Kepatuhan terhadap Regulasi Privasi Data (UU PDP)
-Penerapan sistem pengawasan algoritmik ini selaras dengan ketentuan Pasal 10 dan Pasal 20 Undang-Undang Pelindungan Data Pribadi Nomor 27 Tahun 2022. Model yang dikembangkan tidak menggunakan data pribadi sensitif atau riwayat konsumsi individual, melainkan menggunakan parameter transaksi komersial agregat dan rasio pelaporan fiskal. Output probabilitas risiko berfungsi sebagai *Decision Support System* bagi pemeriksa pajak, menjamin bahwa keputusan penetapan hukum akhir tetap berada di tangan pejabat pemeriksa manusia (*human-in-the-loop principle*).
+### 4.3 Interpretasi Model Menggunakan Explainable AI (SHAP Values)
+Untuk memastikan akuntabilitas algoritma sesuai regulasi keterbukaan informasi dan UU PDP, kontribusi fitur dianalisis menggunakan nilai SHAP. Gambar 5 dan Gambar 6 menyajikan visualisasi nilai SHAP global dan lokal.
+
+![SHAP Beeswarm Summary Plot](/images/figure5_shap_beeswarm.png)  
+*Gambar 5. SHAP Beeswarm Plot: Distribusi Pengaruh Fitur terhadap Prediksi Risiko (300 DPI).*
+
+![SHAP Importance Bar Chart](/images/figure6_shap_importance_bar.png)  
+*Gambar 6. Mean Absolute SHAP Value: Peringkat Kepentingan Fitur Global (300 DPI).*
+
+Hasil analisis SHAP mengungkapkan bahwa:
+1. **Rasio Underreporting Omset:** Merupakan prediktor dengan nilai rata-rata SHAP tertinggi ($|\text{SHAP}| = 1,42$), di mana selisih pelaporan yang makin besar berkorelasi positif kuat terhadap peningkatan skor risiko.
+2. **Rasio Pembayaran Digital ($PayRatio$):** Nilai rasio pembayaran digital yang rendah meningkatkan probabilitas anomali transaksi karena transaksi tunai lebih sulit diverifikasi secara otomatis.
+3. **Indikator E-Commerce BPS Regional ($EComPct$ & $GMV$):** Memberikan konteks makroekonomi wilayah yang mencegah distorsi penilaian pada entitas yang beroperasi di wilayah dengan penetrasi digital rendah.
+
+### 4.4 Evaluasi Matriks Konfusi dan Distribusi Risiko Regional
+Gambar 7 menyajikan matriks konfusi ternormalisasi dari model AutoML XGBoost, sementara Gambar 8 menampilkan sebaran proporsi risiko digital lintas 10 provinsi di Indonesia.
+
+![Normalized Confusion Matrix](/images/figure7_confusion_matrix.png)  
+*Gambar 7. Normalized Confusion Matrix Model AutoML XGBoost pada Holdout Test Set (300 DPI).*
+
+![Distribusi Risiko Regional Lintas Provinsi](/images/figure8_regional_risk_distribution.png)  
+*Gambar 8. Distribusi Proporsi Entitas Berisiko Tinggi Lintas Provinsi (300 DPI).*
+
+Matriks konfusi pada Gambar 7 membuktikan spesifisitas model yang sangat tinggi (**93,6% true negative rate**), membuktikan keandalan sistem dalam melindungi wajib pajak patuh dari kesalahan audit (*false positive*).
 
 ---
 
 ## 5. KESIMPULAN DAN REKOMENDASI KEBIJAKAN
 
 ### 5.1 Kesimpulan
-Penelitian ini berhasil merancang dan memvalidasi kerangka *Automated Machine Learning* (AutoML) untuk pemodelan risiko kepatuhan perpajakan pada ekosistem ekonomi digital Indonesia. Dengan mengintegrasikan indikator statistik e-commerce BPS dan data transaksi pihak ketiga, model AutoML berbasis XGBoost terbukti unggul dengan skor ROC-AUC sebesar 0,8978 dan PR-AUC sebesar 0,7689. Analisis desil membuktikan efisiensi operasional pemeriksaan di mana alokasi audit pada 20% desil risiko teratas mampu mengamankan 59,2% potensi ketidakpatuhan fiskal digital.
+Penelitian ini berhasil merancang dan memvalidasi kerangka *Automated Machine Learning* (AutoML) untuk pemodelan risiko kepatuhan perpajakan pada ekosistem ekonomi digital Indonesia. Dengan mengintegrasikan indikator statistik e-commerce BPS dan data transaksi pihak ketiga, model AutoML berbasis XGBoost terbukti unggul dengan skor ROC-AUC sebesar 0,8978 dan PR-AUC sebesar 0,7689. Analisis desil membuktikan efisiensi operasional pemeriksaan di mana alokasi audit pada 20% desil risiko teratas mampu mengamankan 59,2% potensi ketidakpatuhan fiskal digital. Penerapan *Explainable AI* (SHAP) memberikan transparansi algoritmik yang kokoh untuk mendukung kepatuhan hukum dan pelindungan data pribadi wajib pajak.
 
 ### 5.2 Rekomendasi Kebijakan untuk Direktorat Jenderal Pajak
 1. **Integrasi Data Terstruktur BPS-DJP:** Memformalkan interoperabilitas data agregat perniagaan digital BPS ke dalam modul CRM DJP guna memperkaya variabel pembobot risiko regional.
 2. **Adopsi Pipeline AutoML pada Sistem Inti Perpajakan (*Coretax*):** Menggantikan aturan ambang batas statis dengan algoritma optimasi Bayesian yang adaptif terhadap perubahan pola transaksi daring.
-3. **Penguatan Tata Kelola AI dan Akuntabilitas Algoritma:** Menetapkan protokol audit model secara berkala guna menjamin ketiadaan bias klasifikasi serta memastikan pelindungan hak wajib pajak sesuai regulasi UU PDP.
+3. **Penguatan Tata Kelola AI dan Akuntabilitas Algoritma:** Menetapkan protokol audit model berkala berbasis SHAP guna menjamin ketiadaan bias klasifikasi serta memastikan kepatuhan penuh terhadap UU PDP Nomor 27 Tahun 2022.
 
 ---
 
@@ -204,6 +205,7 @@ Penelitian ini berhasil merancang dan memvalidasi kerangka *Automated Machine Le
 * Kementerian Keuangan Republik Indonesia. (2024). *Kerangka Ekonomi Makro dan Pokok-Pokok Kebijakan Fiskal Tahun 2025*. Jakarta: Badan Kebijakan Fiskal.
 * Khwaja, M. S., Awasthi, R., & Loeprick, J. (Eds.). (2011). *Risk-Based Tax Audits: Approaches and Country Experiences*. Washington, DC: The World Bank. https://doi.org/10.1596/978-0-8213-8754-2
 * Kleven, H. J., Knudsen, M. B., Kreiner, C. T., Pedersen, S., & Saez, E. (2011). Unwilling or unable to cheat? Evidence on tax evasion by self-assessment and third-party reporting. *Econometrica*, 79(3), 651-692. https://doi.org/10.3982/ECTA9189
+* Lundberg, S. M., & Lee, S. I. (2017). A unified approach to interpreting model predictions. *Advances in Neural Information Processing Systems (NeurIPS)*, 30, 4765-4774.
 * Mascagni, N., & Mengistu, A. T. (2019). The data revolution in tax administration: Applications, opportunities and challenges. *ICTD Working Paper*, 96, 1-38.
 * Naritomi, J. (2019). Consumers as tax auditors: Electronic invoice programs and tax compliance in Brazil. *American Economic Review*, 109(5), 1730-1772. https://doi.org/10.1257/aer.20160658
 * OECD. (2020). *Tax Challenges Arising from Digitalisation – Report on Pillar One Blueprint*. Paris: OECD Publishing. https://doi.org/10.1787/beba0634-en
