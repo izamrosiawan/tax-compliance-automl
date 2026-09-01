@@ -27,7 +27,7 @@ Pertumbuhan ekonomi digital di Indonesia terus mencatatkan peningkatan volume tr
 
 Kondisi tersebut memperbesar tantangan asimetri informasi pada pelaporan Surat Pemberitahuan (SPT) Tahunan, terutama pada sektor pedagang skala mikro dan menengah yang memiliki banyak saluran penjualan (Kementerian Keuangan RI, 2024). Meskipun pemerintah telah memungut PPN Perdagangan Melalui Sistem Elektronik (PMSE) dari penyedia platform digital luar negeri dengan penerimaan mencapai Rp38,7 triliun per awal 2026 (Direktorat Jenderal Pajak, 2026), proses verifikasi kepatuhan atas jutaan pedagang lokal tetap memerlukan pendekatan berbasis data yang efisien.
 
-Mengingat keterbatasan jumlah personel pemeriksa pajak, pemeriksaan secara menyeluruh terhadap seluruh pedagang tidak memungkinkan. Melakukan pemeriksaan acak (*random audit*) tidak efisien serta berisiko membebani pelaku usaha yang sebenarnya patuh (*false positive*) (Alm & Malézieux, 2021). Di sisi lain, Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP) mewajibkan pemrosesan data otomatis dilakukan secara akuntabel, terukur, dan meminimalkan beban administratif bagi masyarakat (Republik Indonesia, 2022).
+Mengingat keterbatasan jumlah personel pemeriksa pajak, pemeriksaan secara menyeluruh terhadap seluruh pedagang tidak memungkinkan. Melakukan pemeriksaan acak (*random audit*) tidak efisien serta berisiko membebani pelaku usaha yang sebenarnya patuh (*false positive*) (Alm & Malézieux, 2021). Di sisi lain, Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP) menetapkan kerangka pelindungan data pribadi yang menuntut pemrosesan data secara bertanggung jawab dan akuntabel sesuai ketentuan perundang-undangan yang berlaku (Republik Indonesia, 2022).
 
 Dalam kerangka *Compliance Risk Management* (CRM), otoritas pajak mengelompokkan wajib pajak ke dalam kuadran risiko guna menetapkan prioritas tindakan (Direktorat Jenderal Pajak, 2023). Karena data individual SPT wajib pajak dilindungi oleh asas kerahasiaan jabatan (Pasal 34 UU KUP), riset data sains komputasional membutuhkan tolok ukur simulasi (*simulation benchmark*) yang bebas dari kelemahan metodologis (*target circularity*) untuk menguji efektivitas integrasi data pihak ketiga.
 
@@ -71,7 +71,7 @@ Tabel 1 menyajikan posisi penelitian ini dalam literatur machine learning perpaj
 ## 3. METODOLOGI PENELITIAN
 
 ### 3.1 Data Generating Process (DGP) dan Asumsi Parameter Simulasi
-Parameter numerik dalam proses pembangkitan data merupakan asumsi simulasi terstruktur (*simulation assumptions*) yang diinformasikan oleh karakteristik makro perniagaan digital Indonesia, bukan estimasi empiris langsung dari data wajib pajak individual rahasia. Tabel 2 merangkum struktur variabel, distribusi pembangkitan, dan peranannya dalam eksperimen.
+Parameter numerik dalam proses pembangkitan data merupakan asumsi simulasi terstruktur (*simulation assumptions*) yang diinformasikan oleh karakteristik makro perniagaan digital Indonesia, bukan estimasi empiris langsung dari data wajib pajak individual rahasia. Indikator makro wilayah di-*anchor* pada nilai rata-rata laporan agregat publik BPS (*Statistik e-Commerce 2024* dan *Indeks Pembangunan Teknologi Informasi dan Komunikasi/IP-TIK 2023–2024*) pada 10 provinsi utama dengan penambahan perturbasi acak Gaussian lokal untuk mensimulasikan heterogenitas regional. Tabel 2 merangkum struktur variabel, distribusi pembangkitan, dan peranannya dalam eksperimen.
 
 **Tabel 2. Karakteristik Variabel dan Mekanisme Pembangkitan Data (DGP Table)**
 
@@ -86,8 +86,8 @@ Parameter numerik dalam proses pembangkitan data merupakan asumsi simulasi terst
 | $TaxPaid_i$ | Wajib Pajak (Teramati) | $SPT_i \times 0,005$ (Deterministik dari SPT; PP 55/2022) | Noisy Feature ($X$, Baseline Admin) | **Tidak** |
 | $PayRatio_i$ | Wajib Pajak (Teramati) | $\text{Clip}\left(1.0 - (0.60\delta_{\text{cash}} + \mathcal{N}(0,20, 0,10^2)), 0.05, 0.99\right)$ | Noisy Feature ($X$) | **Tidak** |
 | $Logistics_i$ | Wajib Pajak (Teramati) | $\text{Clip}\left(1.0 - (0.50\delta_{\text{log}} + \mathcal{N}(0,15, 0,08^2)), 0.10, 1.00\right)$ | Noisy Feature ($X$) | **Tidak** |
-| $EComPct_p$ | Provinsi (Makro) | BPS Benchmark Calibration $\pm \mathcal{N}(0, 1.5)$ | Contextual Macro Feature ($X$) | **Tidak** |
-| $Infra_p$ | Provinsi (Makro) | BPS Benchmark Calibration $\pm \mathcal{N}(0, 1.2)$ | Contextual Macro Feature ($X$) | **Tidak** |
+| $EComPct_p$ | Provinsi (Makro) | BPS Benchmark (Rentang 24,3%–62,4%) $\pm \mathcal{N}(0, 1.5)$ | Contextual Macro Feature ($X$) | **Tidak** |
+| $Infra_p$ | Provinsi (Makro) | BPS Benchmark IP-TIK (Rentang 63,1–94,2) $\pm \mathcal{N}(0, 1.2)$ | Contextual Macro Feature ($X$) | **Tidak** |
 | $Y_i$ (Target) | Wajib Pajak (Audit) | $\mathbb{I}(S^*_{\text{audit}} > P_{75}), \quad \text{Prevalensi Positif } = 25,0\%$ | Ground Truth Label ($Y$) | **Target** |
 
 Formula pembentukan skor temuan audit laten adalah:
@@ -147,7 +147,7 @@ Tabel 3 merangkum performa model pada data uji independen ($n=1.000$, dengan gar
 
 Pada Tabel 3, *Logistic Regression* menghasilkan skor ROC-AUC tertinggi ($0,7856$), yang konsisten dengan kompleksitas model yang lebih rendah pada struktur hubungan proksi yang relatif linier dalam DGP yang digunakan. *TPE-optimized XGBoost* berperan penting sebagai model pembanding nonlinier utama ($0,7682$, 95% CI $[0,7346, 0,8011]$). Seluruh model memperoleh PR-AUC di atas garis dasar prevalensi $P(Y=1) = 0,2500$, di mana *Logistic Regression* mencatatkan PR-AUC sebesar $0,5633$ ($2,25\times$ base rate) dan *TPE-optimized XGBoost* sebesar $0,5496$ ($2,20\times$ base rate).
 
-Fokus utama pemanfaatan model adalah **pemeringkatan probabilitas risiko (*risk ranking*)**, di mana pemeriksaan pada kelompok risiko 20% teratas berhasil menjaring **45,6% hingga 47,6% total ketidakpatuhan**. Kurva ROC dan PR disajikan pada Gambar 2 dan Gambar 3.
+Fokus utama pemanfaatan model adalah **pemeringkatan probabilitas risiko (*risk ranking*)**, di mana pemeriksaan pada kelompok risiko 20% teratas berhasil menjaring **45,6% hingga 47,6% kasus positif pada ground truth simulasi**. Kurva ROC dan PR disajikan pada Gambar 2 dan Gambar 3.
 
 ![Kurva ROC Komparatif](/images/figure2_roc_auc_curve.png)  
 *Gambar 2. Kurva ROC Komparatif pada Data Uji Independen (300 DPI).*
@@ -161,7 +161,7 @@ Gambar 4 menampilkan kurva tangkapan kumulatif berdasarkan pemeringkatan risiko 
 ![Kurva Keuntungan Kumulatif per Desil](/images/figure4_cumulative_gains_decile.png)  
 *Gambar 4. Kurva Keuntungan Kumulatif Temuan Audit per Desil Risiko (300 DPI).*
 
-Dengan memprioritaskan pemeriksaan pada **Top 20% kelompok berisiko tertinggi (Desil 1 dan 2)**, sistem berhasil menjaring **45,2% hingga 47,6% dari total potensi ketidakpatuhan**, menghasilkan faktor pengali *cumulative lift* sebesar **$2,26\times$ hingga $2,38\times$** dibandingkan pemilihan audit acak (20%).
+Dengan memprioritaskan pemeriksaan pada **Top 20% kelompok berisiko tertinggi (Desil 1 dan 2)**, sistem berhasil menjaring **45,2% hingga 47,6% dari total kasus positif yang disimulasikan**, menghasilkan faktor pengali *cumulative lift* sebesar **$2,26\times$ hingga $2,38\times$** dibandingkan pemilihan audit acak (20%).
 
 ### 4.3 Studi Ablasi Fitur Bertahap (*Feature Ablation Study*)
 Tabel 4 dan Gambar 5 menyajikan hasil evaluasi ablasi fitur.
@@ -222,7 +222,7 @@ Validasi geografis berulang lintas $R=5$ pasangan provinsi holdout pada Gambar 8
 ## 5. KESIMPULAN DAN REKOMENDASI
 
 ### 5.1 Kesimpulan
-Penelitian ini merumuskan kerangka tolok ukur simulasi non-sirkular yang memisahkan variabel laten temuan audit dari fitur-fitur masukan teramati. Studi ablasi menunjukkan bahwa pelaporan mandiri wajib pajak memiliki keterbatasan daya pembeda (ROC-AUC $0,5641$), sedangkan integrasi data gerbang pembayaran dan logistik secara substansial meningkatkan kualitas pemeringkatan risiko (ROC-AUC $0,7667$ dan Top-20% Risk Yield $46,0\%$). Indikator makro terkalibrasi BPS memberikan peran kontekstual wilayah yang stabil. Model linier *Logistic Regression* memberikan kinerja diskriminasi tertinggi ($0,7856$) yang konsisten dengan kompleksitas model yang lebih rendah pada struktur hubungan linear dalam DGP, sementara *TPE-optimized XGBoost* menyediakan alternatif nonlinier yang kompetitif ($0,7682$). Validasi spasial berulang lintas $R=5$ pasangan provinsi memberikan indikasi ketahanan spasial awal ($0,7643 \pm 0,0321$), dan uji sensitivitas DGP menunjukkan kestabilan relatif struktur pemeringkatan. Analisis SHAP berbasis *mean absolute SHAP* memberikan transparansi atribusi prediktif guna mendukung tata kelola AI yang akuntabel.
+Penelitian ini merumuskan kerangka tolok ukur simulasi non-sirkular yang memisahkan variabel laten temuan audit dari fitur-fitur masukan teramati. Studi ablasi menunjukkan bahwa pelaporan mandiri wajib pajak memiliki keterbatasan daya pembeda (ROC-AUC $0,5641$), sedangkan integrasi data gerbang pembayaran dan logistik secara substansial meningkatkan kualitas pemeringkatan risiko (ROC-AUC $0,7667$ dan Top-20% Risk Yield $46,0\%$). Indikator makro terkalibrasi BPS memberikan kontribusi prediktif marginal dan berfungsi terutama sebagai konteks wilayah dalam DGP yang diuji. Model linier *Logistic Regression* memberikan kinerja diskriminasi tertinggi ($0,7856$) yang konsisten dengan kompleksitas model yang lebih rendah pada struktur hubungan linear dalam DGP, sementara *TPE-optimized XGBoost* menyediakan alternatif nonlinier yang kompetitif ($0,7682$). Validasi spasial berulang lintas $R=5$ pasangan provinsi memberikan indikasi ketahanan spasial awal ($0,7643 \pm 0,0321$), dan uji sensitivitas DGP menunjukkan kestabilan relatif struktur pemeringkatan. Analisis SHAP berbasis *mean absolute SHAP* memberikan transparansi atribusi prediktif guna mendukung tata kelola AI yang akuntabel.
 
 ### 5.2 Rekomendasi Kebijakan
 a. **Interoperabilitas Data Transaksi dan Logistik:** Memprioritaskan penguatan integrasi data pihak ketiga (perbankan, gerbang pembayaran, dan ekspedisi logistik) sebagai pilar utama pengawasan kepatuhan ekonomi digital.
@@ -237,6 +237,8 @@ c. **Validasi Berkala Lintas Wilayah:** Melakukan evaluasi berkala terhadap indi
 * Battaglini, M., Guiso, L., Lacava, C., Miller, D. L., & Patacchini, E. (2022). *Refining Public Policies with Machine Learning: The Case of Tax Auditing* (NBER Working Paper No. 30777). National Bureau of Economic Research. https://doi.org/10.3386/w30777
 * Bergstra, J., Bardenet, R., Bengio, Y., & Kégl, B. (2011). Algorithms for hyper-parameter optimization. *Advances in Neural Information Processing Systems (NeurIPS)*, 24, 2546-2554.
 * de Roux, D., Pérez, B., Moreno, A., Villamil, M. P., & Figueroa, C. (2018). Tax fraud detection for under-reporting declarations using an unsupervised machine learning approach. In *Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining (KDD '18)* (pp. 215-222). Association for Computing Machinery. https://doi.org/10.1145/3219819.3219878
+* Badan Pusat Statistik. (2024). *Statistik E-Commerce 2024*. Jakarta: BPS RI.
+* Badan Pusat Statistik. (2024). *Indeks Pembangunan Teknologi Informasi dan Komunikasi 2023–2024*. Jakarta: BPS RI.
 * Direktorat Jenderal Pajak. (2023). *Laporan Tahunan Direktorat Jenderal Pajak 2023: Transformasi Digital Perpajakan*. Jakarta: Kementerian Keuangan Republik Indonesia.
 * Direktorat Jenderal Pajak. (2026). *Penerimaan Pajak Digital Capai Rp38,7 Triliun per Kuartal I-2026* (Siaran Pers No. SP-08/2026). Jakarta: Kementerian Keuangan Republik Indonesia.
 * Feurer, M., Klein, A., Eggensperger, K., Springenberg, J., Blum, M., & Hutter, F. (2019). Auto-sklearn: Efficient and robust automated machine learning. *Automated Machine Learning*, 113-134. Springer, Cham. https://doi.org/10.1007/978-3-030-05318-5_6
