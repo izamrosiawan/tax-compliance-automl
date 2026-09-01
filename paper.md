@@ -53,14 +53,14 @@ Hasil evaluasi performa model pada *holdout test set* (1.000 sampel) disajikan d
 
 | Model | ROC-AUC | PR-AUC | F1-Score | Precision | Recall |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| Logistic Regression (Baseline) | 0.7810 | 0.5420 | 0.6120 | 0.6350 | 0.5910 |
-| Random Forest (Tuned) | 0.8415 | 0.6830 | 0.7150 | 0.7420 | 0.6900 |
-| **AutoML (LightGBM Optimized)** | **0.8842** | **0.7415** | **0.7820** | **0.8140** | **0.7520** |
+| Logistic Regression (Baseline) | 0.8576 | 0.7044 | 0.5608 | 0.7012 | 0.4680 |
+| Random Forest (Tuned) | 0.8414 | 0.6569 | 0.4837 | 0.6420 | 0.3880 |
+| **AutoML (LightGBM Search Engine)** | **0.8611** | **0.6940** | **0.5938** | **0.7310** | **0.5000** |
 
-Model AutoML berbasis LightGBM mencatatkan peningkatan ROC-AUC sebesar 13,2% dibandingkan model baseline.
+Model AutoML berbasis LightGBM mencatatkan metrik optimasi tertinggi dengan skor ROC-AUC sebesar **0.8611** dan F1-Score sebesar **0.5938**.
 
 ### 3.2 Analisis Lift dan Efisiensi Pemeriksaan (Gains per Decile)
-Pengelompokan wajib pajak ke dalam 10 desil risiko menunjukkan efisiensi pemeriksaan yang signifikan. Dengan memprioritaskan pemeriksaan pada **Desil 1 dan 2 (Top 20% Risiko)**, otoritas perpajakan mampu mengidentifikasi **78,4% total indikasi ketidakpatuhan fiskal digital**, sehingga memangkas beban pemeriksaan sebesar 80% dan meminimalkan kesalahan *false positive* pada wajib pajak patuh.
+Pengelompokan wajib pajak ke dalam 10 desil risiko menunjukkan efisiensi pemeriksaan yang signifikan. Dengan memprioritaskan pemeriksaan pada **Desil 1 dan 2 (Top 20% Risiko)**, otoritas perpajakan mampu mengidentifikasi **54.8% total indikasi ketidakpatuhan fiskal digital**, sehingga memangkas beban pemeriksaan sebesar 80% dan meminimalkan kesalahan *false positive* pada wajib pajak patuh.
 
 ---
 
