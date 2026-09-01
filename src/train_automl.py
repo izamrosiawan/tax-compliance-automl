@@ -3,14 +3,16 @@ import json
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 import optuna
 from optuna.samplers import TPESampler
+import shap
 
 from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import (
     roc_auc_score, precision_recall_curve, auc, 
-    f1_score, precision_score, recall_score, roc_curve
+    f1_score, precision_score, recall_score, roc_curve, confusion_matrix, classification_report
 )
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
@@ -129,6 +131,7 @@ class TaxComplianceAutoMLPipeline:
         self.probabilities[f"AutoML ({best_type})"] = best_model.predict_proba(self.X_test)[:, 1]
         self.predictions[f"AutoML ({best_type})"] = best_model.predict(self.X_test)
         self.best_model_name = f"AutoML ({best_type})"
+        self.best_model = best_model
 
     def evaluate_and_plot(self) -> dict:
         results = {}
@@ -147,6 +150,7 @@ class TaxComplianceAutoMLPipeline:
                 "Recall": round(recall_score(self.y_test, preds), 4)
             }
             
+        # 1. ROC Curves
         plt.figure(figsize=(7, 5), dpi=300)
         for name, probs in self.probabilities.items():
             fpr, tpr, _ = roc_curve(self.y_test, probs)
@@ -161,6 +165,7 @@ class TaxComplianceAutoMLPipeline:
         plt.savefig(os.path.join(self.images_dir, "figure1_roc_auc_curve.png"))
         plt.close()
         
+        # 2. Cumulative Decile Gains
         best_probs = self.probabilities[self.best_model_name]
         gains_df = pd.DataFrame({"y_true": self.y_test, "prob": best_probs})
         gains_df["decile"] = pd.qcut(gains_df["prob"], q=10, labels=False, duplicates="drop")
@@ -183,6 +188,30 @@ class TaxComplianceAutoMLPipeline:
         plt.savefig(os.path.join(self.images_dir, "figure2_cumulative_gains_decile.png"))
         plt.close()
         
+        # 3. SHAP Feature Importance & Interpretability (Anti-Black-Box)
+        explainer = shap.TreeExplainer(self.best_model)
+        shap_values = explainer(self.X_test)
+        
+        plt.figure(figsize=(8, 5), dpi=300)
+        shap.summary_plot(shap_values, self.X_test, show=False)
+        plt.title("SHAP Feature Importance: Explaining Tax Compliance Risk Factors")
+        plt.tight_layout()
+        plt.savefig(os.path.join(self.images_dir, "figure3_shap_feature_importance.png"))
+        plt.close()
+        
+        # 4. Confusion Matrix Normalized
+        cm = confusion_matrix(self.y_test, self.predictions[self.best_model_name], normalize='true')
+        plt.figure(figsize=(6, 5), dpi=300)
+        sns.heatmap(cm, annot=True, fmt=".2%", cmap="Blues", cbar=False,
+                    xticklabels=["Patuh (0)", "Berisiko (1)"],
+                    yticklabels=["Patuh (0)", "Berisiko (1)"])
+        plt.xlabel("Prediksi Model")
+        plt.ylabel("Kondisi Riil")
+        plt.title("Normalized Confusion Matrix: AutoML Risk Classifier")
+        plt.tight_layout()
+        plt.savefig(os.path.join(self.images_dir, "figure4_confusion_matrix.png"))
+        plt.close()
+        
         top20_pct = float(decile_summary.loc[decile_summary["decile"] <= 2, "cum_gains_pct"].max())
         results["top20_decile_gain_pct"] = round(top20_pct, 2)
         return results
@@ -192,6 +221,6 @@ if __name__ == "__main__":
     data = os.path.join(base, "data", "bps_e_commerce_tax_compliance.csv")
     pipeline = TaxComplianceAutoMLPipeline(data_path=data, output_dir=base)
     pipeline.run_baselines()
-    pipeline.optimize_automl(n_trials=25)
+    pipeline.optimize_automl(n_trials=30)
     summary = pipeline.evaluate_and_plot()
     print(json.dumps(summary, indent=2))
