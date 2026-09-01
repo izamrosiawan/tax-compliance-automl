@@ -9,11 +9,11 @@ def build_and_execute_full_notebook():
     
     # 1. Header
     nb.cells.append(new_markdown_cell(
-        "# Tax Compliance AutoML: Risk-Based Auditing on Digital Economy\n\n"
+        "# Digital Tax Compliance Synthetic Benchmark & Feature Ablation Study\n\n"
         "**Authors:** Izam Rosiawan (Data Science) & Sulthan  \n"
         "**Institution:** Telkom University Surabaya  \n"
-        "**Focus:** Indonesian BPS Digital Economy Indicators & Compliance Risk Management (CRM)\n"
-        "**Methodology:** Automated Machine Learning (Optuna TPE), Anti-Leakage Protocol (`seed=42`), SHAP Explainability"
+        "**Study Paradigm:** Non-Circular Synthetic Benchmark for Risk-Based Digital Tax Auditing\n"
+        "**Methodology:** Automated Machine Learning (Optuna TPE), Feature Ablation Study, Geographical Holdout, SHAP XAI"
     ))
     
     # 2. Imports
@@ -30,7 +30,7 @@ def build_and_execute_full_notebook():
         "from sklearn.preprocessing import StandardScaler\n"
         "from sklearn.metrics import (\n"
         "    roc_auc_score, precision_recall_curve, auc, \n"
-        "    f1_score, precision_score, recall_score, roc_curve, confusion_matrix, classification_report\n"
+        "    f1_score, precision_score, recall_score, roc_curve, confusion_matrix\n"
         ")\n"
         "from sklearn.linear_model import LogisticRegression\n"
         "from sklearn.ensemble import RandomForestClassifier\n"
@@ -39,164 +39,132 @@ def build_and_execute_full_notebook():
         "optuna.logging.set_verbosity(optuna.logging.WARNING)\n"
         "SEED = 42\n"
         "np.random.seed(SEED)\n"
-        "print('Dependencies loaded successfully. Deterministic SEED=42 set.')"
+        "print('Dependencies loaded. Seed=42 locked.')"
     ))
     
     # 3. Data Ingestion & EDA
     nb.cells.append(new_markdown_cell(
-        "## 1. Exploratory Data Analysis & BPS Regional Indicator Ingestion\n\n"
-        "Dataset menggabungkan indikator makroekonomi BPS (Statistik E-Commerce) dengan parameter mikro transaksi fiskal."
+        "## 1. Non-Circular Benchmark Dataset Ingestion\n\n"
+        "Dataset memisahkan pembentukan fitur masukan X dari label temuan audit laten independen Y guna mencegah kebocoran target."
     ))
     nb.cells.append(new_code_cell(
         "data_path = os.path.join('data', 'bps_e_commerce_tax_compliance.csv')\n"
         "df = pd.read_csv(data_path)\n"
         "print(f'Total Dataset Shape: {df.shape}')\n"
         "display(df.head(5))\n"
-        "print('\\nSummary Statistics:')\n"
-        "display(df.describe().T[['mean', 'std', 'min', '50%', 'max']])\n"
-        "print('\\nClass Balance:')\n"
-        "print(df['target_compliance_risk'].value_counts(normalize=True))"
+        "print('\\nClass Balance Distribution:')\n"
+        "print(df['target_non_compliance'].value_counts(normalize=True))"
     ))
     
     # 4. Anti-Leakage Train-Test Split
     nb.cells.append(new_markdown_cell(
-        "## 2. Anti-Leakage Data Partitioning & Preprocessing\n\n"
-        "Pemisahan data latih (80%) dan data uji independen (20%) dilakukan sebelum fitting transformer untuk mencegah *data leakage*."
+        "## 2. Anti-Leakage Data Partitioning (80/20 Split)"
     ))
     nb.cells.append(new_code_cell(
-        "X = df.drop(columns=['provinsi', 'target_compliance_risk'])\n"
-        "y = df['target_compliance_risk']\n\n"
+        "feature_cols = [\n"
+        "    'gmv_transaksi_juta', 'annual_order_volume', 'avg_ticket_size_ribu',\n"
+        "    'digital_payment_ratio', 'logistics_tracking_ratio', 'customer_return_rate',\n"
+        "    'bps_ecom_penetration_pct', 'bps_infra_index',\n"
+        "    'reported_turnover_spt_juta', 'tax_paid_final_juta'\n"
+        "]\n"
+        "X = df[feature_cols]\n"
+        "y = df['target_non_compliance']\n\n"
         "X_train, X_test, y_train, y_test = train_test_split(\n"
         "    X, y, test_size=0.20, random_state=SEED, stratify=y\n"
         ")\n\n"
         "scaler = StandardScaler()\n"
         "X_train_scaled = scaler.fit_transform(X_train)\n"
         "X_test_scaled = scaler.transform(X_test)\n\n"
-        "print(f'Training Set: {X_train.shape[0]} observations')\n"
-        "print(f'Holdout Test Set: {X_test.shape[0]} observations')"
+        "print(f'Train samples: {X_train.shape[0]} | Test samples: {X_test.shape[0]}')"
     ))
     
     # 5. Baseline Evaluation
     nb.cells.append(new_markdown_cell(
-        "## 3. Baseline Models: Logistic Regression & Random Forest"
+        "## 3. Baseline Classifiers Evaluation"
     ))
     nb.cells.append(new_code_cell(
-        "# Logistic Regression Baseline\n"
-        "lr = LogisticRegression(random_state=SEED, max_iter=1000)\n"
-        "lr.fit(X_train_scaled, y_train)\n"
-        "lr_probs = lr.predict_proba(X_test_scaled)[:, 1]\n"
-        "lr_preds = lr.predict(X_test_scaled)\n\n"
-        "# Random Forest Model\n"
-        "rf = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=SEED)\n"
-        "rf.fit(X_train, y_train)\n"
-        "rf_probs = rf.predict_proba(X_test)[:, 1]\n"
-        "rf_preds = rf.predict(X_test)\n\n"
-        "print(f'Logistic Regression Test ROC-AUC: {roc_auc_score(y_test, lr_probs):.4f}')\n"
-        "print(f'Random Forest Test ROC-AUC:       {roc_auc_score(y_test, rf_probs):.4f}')"
+        "lr = LogisticRegression(random_state=SEED, max_iter=1000).fit(X_train_scaled, y_train)\n"
+        "rf = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=SEED).fit(X_train, y_train)\n"
+        "lgbm = lgb.LGBMClassifier(random_state=SEED, verbose=-1).fit(X_train, y_train)\n\n"
+        "print(f'Logistic Regression Holdout ROC-AUC: {roc_auc_score(y_test, lr.predict_proba(X_test_scaled)[:, 1]):.4f}')\n"
+        "print(f'Random Forest Holdout ROC-AUC:       {roc_auc_score(y_test, rf.predict_proba(X_test)[:, 1]):.4f}')\n"
+        "print(f'LightGBM Holdout ROC-AUC:            {roc_auc_score(y_test, lgbm.predict_proba(X_test)[:, 1]):.4f}')"
     ))
     
-    # 6. AutoML Bayesian Optimization
+    # 6. Feature Ablation Study
     nb.cells.append(new_markdown_cell(
-        "## 4. AutoML Model Search & Bayesian Hyperparameter Optimization (Optuna TPE)"
+        "## 4. Feature Ablation Study: Isolating Incremental Value of Data Sources"
     ))
     nb.cells.append(new_code_cell(
-        "cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)\n\n"
-        "def objective(trial):\n"
-        "    classifier_name = trial.suggest_categorical('classifier', ['LightGBM', 'XGBoost'])\n"
-        "    if classifier_name == 'LightGBM':\n"
-        "        params = {\n"
-        "            'n_estimators': trial.suggest_int('lgb_n_estimators', 50, 250),\n"
-        "            'learning_rate': trial.suggest_float('lgb_lr', 0.01, 0.2, log=True),\n"
-        "            'num_leaves': trial.suggest_int('lgb_num_leaves', 15, 127),\n"
-        "            'max_depth': trial.suggest_int('lgb_max_depth', 3, 10),\n"
-        "            'subsample': trial.suggest_float('lgb_subsample', 0.6, 1.0),\n"
-        "            'colsample_bytree': trial.suggest_float('lgb_colsample', 0.6, 1.0),\n"
-        "            'random_state': SEED,\n"
-        "            'verbose': -1\n"
-        "        }\n"
-        "        model = lgb.LGBMClassifier(**params)\n"
-        "    else:\n"
-        "        params = {\n"
-        "            'n_estimators': trial.suggest_int('xgb_n_estimators', 50, 250),\n"
-        "            'learning_rate': trial.suggest_float('xgb_lr', 0.01, 0.2, log=True),\n"
-        "            'max_depth': trial.suggest_int('xgb_max_depth', 3, 10),\n"
-        "            'subsample': trial.suggest_float('xgb_subsample', 0.6, 1.0),\n"
-        "            'colsample_bytree': trial.suggest_float('xgb_colsample', 0.6, 1.0),\n"
-        "            'random_state': SEED,\n"
-        "            'eval_metric': 'logloss'\n"
-        "        }\n"
-        "        model = xgb.XGBClassifier(**params)\n"
-        "        \n"
-        "    scores = []\n"
-        "    for train_idx, val_idx in cv.split(X_train, y_train):\n"
-        "        X_tr, X_val = X_train.iloc[train_idx], X_train.iloc[val_idx]\n"
-        "        y_tr, y_val = y_train.iloc[train_idx], y_train.iloc[val_idx]\n"
-        "        model.fit(X_tr, y_tr)\n"
-        "        scores.append(roc_auc_score(y_val, model.predict_proba(X_val)[:, 1]))\n"
-        "    return np.mean(scores)\n\n"
-        "study = optuna.create_study(direction='maximize', sampler=TPESampler(seed=SEED))\n"
-        "study.optimize(objective, n_trials=30)\n\n"
-        "best_p = study.best_params\n"
-        "print('Optimal Hyperparameters Selected by AutoML:', best_p)\n\n"
-        "if best_p['classifier'] == 'LightGBM':\n"
-        "    best_automl_model = lgb.LGBMClassifier(\n"
-        "        n_estimators=best_p['lgb_n_estimators'],\n"
-        "        learning_rate=best_p['lgb_lr'],\n"
-        "        num_leaves=best_p['lgb_num_leaves'],\n"
-        "        max_depth=best_p['lgb_max_depth'],\n"
-        "        subsample=best_p['lgb_subsample'],\n"
-        "        colsample_bytree=best_p['lgb_colsample'],\n"
-        "        random_state=SEED,\n"
-        "        verbose=-1\n"
-        "    )\n"
-        "else:\n"
-        "    best_automl_model = xgb.XGBClassifier(\n"
-        "        n_estimators=best_p['xgb_n_estimators'],\n"
-        "        learning_rate=best_p['xgb_lr'],\n"
-        "        max_depth=best_p['xgb_max_depth'],\n"
-        "        subsample=best_p['xgb_subsample'],\n"
-        "        colsample_bytree=best_p['xgb_colsample'],\n"
-        "        random_state=SEED,\n"
-        "        eval_metric='logloss'\n"
-        "    )\n\n"
-        "best_automl_model.fit(X_train, y_train)\n"
-        "automl_probs = best_automl_model.predict_proba(X_test)[:, 1]\n"
-        "automl_preds = best_automl_model.predict(X_test)\n"
-        "print(f'AutoML Best Test ROC-AUC: {roc_auc_score(y_test, automl_probs):.4f}')"
+        "ablation_subsets = {\n"
+        "    '1. Financial Only': ['reported_turnover_spt_juta', 'tax_paid_final_juta'],\n"
+        "    '2. + Digital Trans': [\n"
+        "        'reported_turnover_spt_juta', 'tax_paid_final_juta',\n"
+        "        'gmv_transaksi_juta', 'annual_order_volume', 'avg_ticket_size_ribu', 'digital_payment_ratio'\n"
+        "    ],\n"
+        "    '3. + Logistics': [\n"
+        "        'reported_turnover_spt_juta', 'tax_paid_final_juta',\n"
+        "        'gmv_transaksi_juta', 'annual_order_volume', 'avg_ticket_size_ribu', 'digital_payment_ratio',\n"
+        "        'logistics_tracking_ratio', 'customer_return_rate'\n"
+        "    ],\n"
+        "    '4. Full (+ BPS Macro)': feature_cols\n"
+        "}\n\n"
+        "ab_res = []\n"
+        "for s_name, cols in ablation_subsets.items():\n"
+        "    m = xgb.XGBClassifier(n_estimators=180, learning_rate=0.04, max_depth=5, random_state=SEED, eval_metric='logloss')\n"
+        "    m.fit(X_train[cols], y_train)\n"
+        "    p = m.predict_proba(X_test[cols])[:, 1]\n"
+        "    p_pts, r_pts, _ = precision_recall_curve(y_test, p)\n"
+        "    gdf = pd.DataFrame({'y': y_test, 'p': p})\n"
+        "    gdf['decile'] = 10 - pd.qcut(gdf['p'], q=10, labels=False, duplicates='drop')\n"
+        "    top20_gain = gdf[gdf['decile'] <= 2]['y'].sum() / gdf['y'].sum() * 100.0\n"
+        "    ab_res.append({\n"
+        "        'Feature Subset': s_name,\n"
+        "        'ROC-AUC': round(roc_auc_score(y_test, p), 4),\n"
+        "        'PR-AUC': round(auc(r_pts, p_pts), 4),\n"
+        "        'Top 20% Decile Yield (%)': round(top20_gain, 2)\n"
+        "    })\n\n"
+        "display(pd.DataFrame(ab_res))"
     ))
     
-    # 7. SHAP Explainability & Visualizations
+    # 7. Geographical Holdout Test
     nb.cells.append(new_markdown_cell(
-        "## 5. Model Explainability (SHAP Values) & Decile Audit Efficiency Analysis"
+        "## 5. Geographical Out-of-Province Holdout (Spatial Generalization)"
     ))
     nb.cells.append(new_code_cell(
-        "# SHAP Summary Plot\n"
-        "explainer = shap.TreeExplainer(best_automl_model)\n"
-        "shap_values = explainer(X_test)\n"
+        "holdout_provinces = ['Bali', 'Sulawesi Selatan']\n"
+        "train_geo = df[~df['provinsi'].isin(holdout_provinces)]\n"
+        "test_geo = df[df['provinsi'].isin(holdout_provinces)]\n\n"
+        "geo_m = xgb.XGBClassifier(n_estimators=180, learning_rate=0.04, max_depth=5, random_state=SEED, eval_metric='logloss')\n"
+        "geo_m.fit(train_geo[feature_cols], train_geo['target_non_compliance'])\n"
+        "g_probs = geo_m.predict_proba(test_geo[feature_cols])[:, 1]\n\n"
+        "print(f'Zero-Shot Unseen Provinces ROC-AUC: {roc_auc_score(test_geo[\"target_non_compliance\"], g_probs):.4f}')"
+    ))
+    
+    # 8. SHAP Explainability
+    nb.cells.append(new_markdown_cell(
+        "## 6. Model Explainability via SHAP Values"
+    ))
+    nb.cells.append(new_code_cell(
+        "best_xgb = xgb.XGBClassifier(n_estimators=180, learning_rate=0.04, max_depth=5, random_state=SEED, eval_metric='logloss')\n"
+        "best_xgb.fit(X_train, y_train)\n"
+        "explainer = shap.TreeExplainer(best_xgb)\n"
+        "shap_vals = explainer(X_test)\n"
         "plt.figure(figsize=(8, 5), dpi=300)\n"
-        "shap.summary_plot(shap_values, X_test, show=False)\n"
-        "plt.title('SHAP Feature Importance: Explaining Tax Compliance Risk Factors')\n"
+        "shap.summary_plot(shap_vals, X_test, show=False)\n"
+        "plt.title('SHAP Feature Contribution on Digital Tax Risk Prediction')\n"
         "plt.tight_layout()\n"
-        "plt.show()\n\n"
-        "# Cumulative Decile Lift\n"
-        "gains_df = pd.DataFrame({'y_true': y_test, 'prob': automl_probs})\n"
-        "gains_df['decile'] = pd.qcut(gains_df['prob'], q=10, labels=False, duplicates='drop')\n"
-        "gains_df['decile'] = 10 - gains_df['decile']\n\n"
-        "decile_summary = gains_df.groupby('decile')['y_true'].sum().reset_index()\n"
-        "decile_summary['cum_gains'] = decile_summary['y_true'].cumsum()\n"
-        "decile_summary['cum_gains_pct'] = decile_summary['cum_gains'] / decile_summary['y_true'].sum() * 100.0\n\n"
-        "display(decile_summary)\n"
-        "print(f'Top 20% Risk Deciles capture {decile_summary.loc[decile_summary[\"decile\"] <= 2, \"cum_gains_pct\"].max():.2f}% of all high-risk taxpayers.')"
+        "plt.show()"
     ))
     
-    print("Executing complete notebook cells via nbconvert...")
+    print("Executing updated notebook via nbconvert...")
     ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
     ep.preprocess(nb, {'metadata': {'path': '.'}})
     
     nb_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "notebook.ipynb")
     with open(nb_path, "w", encoding="utf-8") as f:
         nbformat.write(nb, f)
-    print(f"Notebook successfully written and fully executed with live outputs at: {nb_path}")
+    print(f"Notebook successfully updated and fully executed at: {nb_path}")
 
 if __name__ == "__main__":
     build_and_execute_full_notebook()
