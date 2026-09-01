@@ -4,7 +4,6 @@
 [![AutoML](https://img.shields.io/badge/AutoML-Optuna%20TPE-orange.svg)](https://optuna.org/)
 [![Standard](https://img.shields.io/badge/Standard-Canonical--5--Repo-emerald.svg)](#)
 [![Domain](https://img.shields.io/badge/Domain-Fiscal%20Data%20Science-green.svg)](#)
-[![Paper](https://img.shields.io/badge/Paper-SINTA%202%20%2F%20Scopus-purple.svg)](paper.md)
 
 Repositori ini menyajikan studi sains data fiskal komputasional, pemodelan pengawasan kepatuhan perpajakan berbasis risiko (*Compliance Risk Management*/CRM), serta optimasi *Automated Machine Learning* (AutoML berbasis Bayesian TPE) pada ekosistem ekonomi digital Indonesia. Studi ini mengintegrasikan indikator statistik perniagaan elektronik Badan Pusat Statistik (BPS) tingkat provinsi dengan parameter transaksi perbankan (*payment gateway*), logistik pengiriman barang, dan data pelaporan Surat Pemberitahuan (SPT) Tahunan.
 
@@ -39,7 +38,6 @@ tax-compliance-automl/
 ├── tests/                  # Automated unit tests (Pytest: Anti-Data Leakage Verified)
 │   └── test_pipeline.py
 ├── notebook.ipynb          # Master exploratory & modeling Jupyter Notebook
-├── paper.md                # Naskah Lengkap Publikasi Ilmiah IMRaD (SINTA 2 / Scopus)
 ├── requirements.txt        # Pinned stable dependencies
 └── README.md               # Laporan komprehensif proyek
 ```
@@ -175,13 +173,6 @@ pytest tests/ -v
    ```bash
    jupyter notebook notebook.ipynb
    ```
-
----
-
-## 📄 Naskah Publikasi Ilmiah
-
-Naskah lengkap siap submit ke jurnal terakreditasi **SINTA 2** atau **Scopus** tersedia pada file:  
-👉 **[`paper.md`](paper.md)**
 
 ---
 **Penulis:** Izam Rosiawan (NIM: 103102400049) & Sulthan  
