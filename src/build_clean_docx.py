@@ -43,15 +43,12 @@ def sanitize_math(text: str) -> str:
     t = t.replace('\\', '')
     return t
 
-def add_formatted_runs(paragraph, text: str, default_font_size=Pt(10.5), is_italic_block=False):
+def add_formatted_runs(paragraph, text: str, default_font_size=Pt(11), is_italic_block=False):
     """
     Renders text by converting Markdown asterisks (*italic* and **bold**) 
     into true Word Runs with zero literal asterisks.
     """
     clean = sanitize_math(text)
-    
-    # Split tokens by markdown bold and italic markers
-    # Matches **bold** or *italic*
     tokens = re.split(r'(\*\*.*?\*\*|\*.*?\*)', clean)
     
     for token in tokens:
@@ -113,8 +110,27 @@ def render_table(doc, tbl_lines):
     cols = max(len(r) for r in rows_data)
     tbl = doc.add_table(rows=len(rows_data), cols=cols)
     tbl.alignment = WD_TABLE_ALIGNMENT.CENTER
-    tbl.autofit = True
     
+    # Set explicit table width to 6.3 inches (full text width)
+    tbl_pr = tbl._tbl.tblPr
+    tbl_w = parse_xml(r'<w:tblW {} w:w="9072" w:type="dxa"/>'.format(nsdecls('w')))
+    tbl_pr.append(tbl_w)
+    
+    # Distribute column widths intelligently
+    total_width_inches = 6.3
+    # If 9 columns (Table 3):
+    if cols == 9:
+        col_widths = [1.2, 0.6, 0.8, 0.7, 0.5, 0.5, 0.6, 0.5, 0.9]
+    elif cols == 5:
+        # Table 2 or Table 4
+        col_widths = [1.2, 0.9, 1.4, 2.0, 0.8]
+    elif cols == 4:
+        col_widths = [1.8, 1.8, 1.35, 1.35]
+    elif cols == 7:
+        col_widths = [0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9]
+    else:
+        col_widths = [total_width_inches / cols] * cols
+        
     for i, row in enumerate(rows_data):
         is_header = (i == 0)
         is_last = (i == len(rows_data) - 1)
@@ -122,11 +138,12 @@ def render_table(doc, tbl_lines):
             if j >= cols:
                 continue
             cell = tbl.cell(i, j)
+            cell.width = Inches(col_widths[min(j, len(col_widths)-1)])
             cell.text = ""
             p = cell.paragraphs[0]
-            p.paragraph_format.space_before = Pt(3)
-            p.paragraph_format.space_after = Pt(3)
-            p.paragraph_format.line_spacing = 1.05
+            p.paragraph_format.space_before = Pt(4)
+            p.paragraph_format.space_after = Pt(4)
+            p.paragraph_format.line_spacing = 1.10
             
             clean_str = sanitize_math(cell_text).replace('*', '')
             if j == 0 and not is_header and len(clean_str) > 6:
@@ -136,7 +153,9 @@ def render_table(doc, tbl_lines):
             else:
                 p.alignment = WD_ALIGN_PARAGRAPH.LEFT
                 
-            add_formatted_runs(p, cell_text, default_font_size=Pt(8.5))
+            # Table font size standard: 9.5 pt for readable text, 8.5 pt for wide 9-col table
+            table_font_pt = Pt(8.5) if cols >= 8 else Pt(9.5)
+            add_formatted_runs(p, cell_text, default_font_size=table_font_pt)
             set_cell_borders(cell, is_header=is_header, is_last=is_last)
             if is_header:
                 shd = parse_xml(r'<w:shd {} w:fill="F5F5F5"/>'.format(nsdecls('w')))
@@ -160,7 +179,7 @@ def generate_sinta_docx():
     style_normal = doc.styles['Normal']
     font = style_normal.font
     font.name = 'Times New Roman'
-    font.size = Pt(10.5)
+    font.size = Pt(11) # Standard journal body font
     font.color.rgb = RGBColor(0, 0, 0)
     
     with open("paper.md", "r", encoding="utf-8") as f:
@@ -208,13 +227,13 @@ def generate_sinta_docx():
     p_aff.paragraph_format.space_after = Pt(2)
     p_aff.paragraph_format.line_spacing = 1.05
     r_aff1 = p_aff.add_run("1Program Studi Sains Data, Fakultas Informatika, Telkom University Kampus Surabaya, Indonesia\n")
-    r_aff1.font.size = Pt(9.5)
+    r_aff1.font.size = Pt(10)
     r_aff2 = p_aff.add_run("2Direktorat Kampus Surabaya, Telkom University Kampus Surabaya, Indonesia\n")
-    r_aff2.font.size = Pt(9.5)
+    r_aff2.font.size = Pt(10)
     r_aff3 = p_aff.add_run("*Penulis Korespondensi: izamrosiawan@student.telkomuniversity.ac.id")
-    r_aff3.font.size = Pt(9.0)
+    r_aff3.font.size = Pt(9.5)
     r_aff3.italic = True
-    p_aff.paragraph_format.space_after = Pt(10)
+    p_aff.paragraph_format.space_after = Pt(12)
     
     # Top Divider Line
     p_line1 = doc.add_paragraph()
@@ -229,21 +248,21 @@ def generate_sinta_docx():
     p_abs.paragraph_format.line_spacing = 1.0
     r_h_id = p_abs.add_run("ABSTRAK — ")
     r_h_id.bold = True
-    r_h_id.font.size = Pt(9.5)
+    r_h_id.font.size = Pt(10)
     
     m_abs_id = re.search(r'### ABSTRAK\s*\n(.*?)\n\s*\*\*Kata Kunci:\*\*\s*(.*?)\n', md_content, re.DOTALL)
     abs_id_txt = m_abs_id.group(1).strip() if m_abs_id else ""
     kw_id_txt = m_abs_id.group(2).strip() if m_abs_id else ""
-    add_formatted_runs(p_abs, abs_id_txt, default_font_size=Pt(9.5))
+    add_formatted_runs(p_abs, abs_id_txt, default_font_size=Pt(10))
     
     p_kw_id = doc.add_paragraph()
     p_kw_id.paragraph_format.space_after = Pt(8)
     r_kwt_id = p_kw_id.add_run("Kata Kunci: ")
     r_kwt_id.bold = True
-    r_kwt_id.font.size = Pt(9.5)
+    r_kwt_id.font.size = Pt(10)
     r_kw_body_id = p_kw_id.add_run(sanitize_math(kw_id_txt))
     r_kw_body_id.italic = True
-    r_kw_body_id.font.size = Pt(9.5)
+    r_kw_body_id.font.size = Pt(10)
     
     # Abstrak Inggris
     p_eabs = doc.add_paragraph()
@@ -252,21 +271,21 @@ def generate_sinta_docx():
     p_eabs.paragraph_format.line_spacing = 1.0
     r_h_en = p_eabs.add_run("ABSTRACT — ")
     r_h_en.bold = True
-    r_h_en.font.size = Pt(9.5)
+    r_h_en.font.size = Pt(10)
     
     m_abs_en = re.search(r'### ABSTRACT\s*\n\*(.*?)\*\n\s*\*\*Keywords:\*\*\s*(.*?)\n', md_content, re.DOTALL)
     abs_en_txt = m_abs_en.group(1).strip() if m_abs_en else ""
     kw_en_txt = m_abs_en.group(2).strip() if m_abs_en else ""
-    add_formatted_runs(p_eabs, abs_en_txt, default_font_size=Pt(9.5), is_italic_block=True)
+    add_formatted_runs(p_eabs, abs_en_txt, default_font_size=Pt(10), is_italic_block=True)
     
     p_kw_en = doc.add_paragraph()
     p_kw_en.paragraph_format.space_after = Pt(8)
     r_kwt_en = p_kw_en.add_run("Keywords: ")
     r_kwt_en.bold = True
-    r_kwt_en.font.size = Pt(9.5)
+    r_kwt_en.font.size = Pt(10)
     r_kw_body_en = p_kw_en.add_run(sanitize_math(kw_en_txt))
     r_kw_body_en.italic = True
-    r_kw_body_en.font.size = Pt(9.5)
+    r_kw_body_en.font.size = Pt(10)
     
     # Bottom Divider Line
     p_line2 = doc.add_paragraph()
@@ -307,7 +326,7 @@ def generate_sinta_docx():
             r = p.add_run(h_text)
             r.bold = True
             r.font.name = 'Times New Roman'
-            r.font.size = Pt(11)
+            r.font.size = Pt(12)
         # Heading 2
         elif line.startswith("### "):
             h_text = sanitize_math(line[4:]).replace('*', '')
@@ -319,7 +338,7 @@ def generate_sinta_docx():
             r.bold = True
             r.italic = True
             r.font.name = 'Times New Roman'
-            r.font.size = Pt(10.5)
+            r.font.size = Pt(11)
         # Bold-Italic Sub-headline (e.g. *Analisis Overfitting:*)
         elif line.startswith("*") and line.endswith(":*"):
             sub_text = line.strip('*').rstrip(':')
@@ -331,7 +350,7 @@ def generate_sinta_docx():
             r.bold = True
             r.italic = True
             r.font.name = 'Times New Roman'
-            r.font.size = Pt(10)
+            r.font.size = Pt(11)
         # Images
         elif line.startswith("!["):
             m_img = re.search(r'!\[(.*?)\]\((.*?)\)', line)
@@ -343,7 +362,7 @@ def generate_sinta_docx():
                     p_img.paragraph_format.space_before = Pt(8)
                     p_img.paragraph_format.space_after = Pt(2)
                     r_img = p_img.add_run()
-                    r_img.add_picture(img_path, width=Inches(5.6))
+                    r_img.add_picture(img_path, width=Inches(6.0))
         # Image Caption
         elif line.startswith("*Gambar ") or line.startswith("Gambar "):
             p_cap = doc.add_paragraph()
@@ -352,7 +371,7 @@ def generate_sinta_docx():
             clean_cap = line.strip('*')
             r_cap = p_cap.add_run(clean_cap)
             r_cap.font.name = 'Times New Roman'
-            r_cap.font.size = Pt(9.0)
+            r_cap.font.size = Pt(9.5)
             r_cap.italic = True
         # Table Caption
         elif line.startswith("**Tabel ") or line.startswith("Tabel "):
@@ -364,7 +383,7 @@ def generate_sinta_docx():
             r_tcap = p_tcap.add_run(clean_tcap)
             r_tcap.bold = True
             r_tcap.font.name = 'Times New Roman'
-            r_tcap.font.size = Pt(9.5)
+            r_tcap.font.size = Pt(10)
         # Table Footnote / Notes
         elif line.startswith("*(") and line.endswith(")*"):
             p_tnot = doc.add_paragraph()
@@ -374,7 +393,7 @@ def generate_sinta_docx():
             r_tnot = p_tnot.add_run(clean_not)
             r_tnot.italic = True
             r_tnot.font.name = 'Times New Roman'
-            r_tnot.font.size = Pt(8.5)
+            r_tnot.font.size = Pt(9.0)
         # References (hanging indent)
         elif line.startswith("* "):
             p_ref = doc.add_paragraph()
@@ -382,8 +401,8 @@ def generate_sinta_docx():
             p_ref.paragraph_format.left_indent = Inches(0.3)
             p_ref.paragraph_format.first_line_indent = Inches(-0.3)
             p_ref.paragraph_format.space_after = Pt(4)
-            p_ref.paragraph_format.line_spacing = 1.05
-            add_formatted_runs(p_ref, line[2:].strip(), default_font_size=Pt(9.5))
+            p_ref.paragraph_format.line_spacing = 1.10
+            add_formatted_runs(p_ref, line[2:].strip(), default_font_size=Pt(10))
         # Lists (a., b., c., 1., 2., etc.)
         elif re.match(r'^[a-d]\.\s', line) or re.match(r'^\d\.\s', line):
             p_li = doc.add_paragraph()
@@ -391,7 +410,7 @@ def generate_sinta_docx():
             p_li.paragraph_format.left_indent = Inches(0.25)
             p_li.paragraph_format.space_after = Pt(3)
             p_li.paragraph_format.line_spacing = 1.15
-            add_formatted_runs(p_li, line, default_font_size=Pt(10.5))
+            add_formatted_runs(p_li, line, default_font_size=Pt(11))
         # Code/Verbatim Diagram Box
         elif line.startswith("```"):
             code_lines = []
@@ -405,7 +424,7 @@ def generate_sinta_docx():
             p_code.paragraph_format.space_after = Pt(6)
             r_code = p_code.add_run("\n".join(code_lines))
             r_code.font.name = 'Consolas'
-            r_code.font.size = Pt(8.0)
+            r_code.font.size = Pt(8.5)
         # Standalone equation
         elif line.startswith("$$") and line.endswith("$$"):
             p_eq = doc.add_paragraph()
@@ -416,7 +435,7 @@ def generate_sinta_docx():
             r_eq = p_eq.add_run(eq_text)
             r_eq.font.name = 'Times New Roman'
             r_eq.italic = True
-            r_eq.font.size = Pt(10.5)
+            r_eq.font.size = Pt(11)
         # Standard Paragraph
         else:
             p_p = doc.add_paragraph()
@@ -424,16 +443,16 @@ def generate_sinta_docx():
             p_p.paragraph_format.first_line_indent = Inches(0.35)
             p_p.paragraph_format.space_after = Pt(5)
             p_p.paragraph_format.line_spacing = 1.15
-            add_formatted_runs(p_p, line, default_font_size=Pt(10.5))
+            add_formatted_runs(p_p, line, default_font_size=Pt(11))
             
         idx += 1
         
     if table_lines:
         render_table(doc, table_lines)
         
-    out_path = "tax_compliance_manuscript_clean.docx"
+    out_path = "tax_compliance_manuscript_sinta2_final.docx"
     doc.save(out_path)
-    print("Document successfully generated without artifacts.")
+    print("Document successfully generated with standard comfortable typography and table widths.")
 
 if __name__ == "__main__":
     generate_sinta_docx()
